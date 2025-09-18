@@ -267,88 +267,7 @@ const AIChatbot = () => {
     "What are the common search parameters?",
   ];
 
-  // Function to fetch data from API endpoints
-  const fetchData = async (url) => {
-    // Check cache first
-    if (cache[url]) {
-      return cache[url];
-    }
-
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      
-      // Cache the response
-      setCache(prevCache => ({
-        ...prevCache,
-        [url]: data
-      }));
-      
-      return data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
-  };
-
-  // Function to format API response for display with pagination
-  const formatApiResponse = (data, system, query, showAll = false) => {
-    if (!data || !data.results || data.results.length === 0) {
-      return {
-        content: `No results found for "${query}" in ${system}.`,
-        hasMore: false,
-        fullData: null
-      };
-    }
-
-    let response = `Found ${data.count} result(s) for "${query}" in ${system}:\n\n`;
-    const itemsToShow = showAll ? data.results : data.results.slice(0, 5);
-    
-    itemsToShow.forEach((item, index) => {
-      response += `${index + 1}. `;
-      
-      if (system === 'ayurveda') {
-        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Hindi: ${item.hindi_name || 'N/A'}\n`;
-      } else if (system === 'siddha') {
-        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Tamil: ${item.tamil_name || 'N/A'}\n`;
-      } else if (system === 'unani') {
-        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Arabic: ${item.arabic_name || 'N/A'}\n`;
-      } else if (system === 'icd11') {
-        response += `Code: ${item.code || 'N/A'}, Title: ${item.title || 'N/A'}\n`;
-      } else if (system === 'mappings') {
-        if (item.source_term && item.icd_mapping) {
-          response += `Term: ${item.source_term.english_name || 'N/A'} (${item.source_term.code || 'N/A'}) → ICD-11: ${item.icd_mapping.code || 'N/A'} (${item.icd_mapping.title || 'N/A'}), Confidence: ${(item.confidence_score * 100).toFixed(1)}%\n`;
-        }
-      }
-    });
-
-    const hasMore = data.count > 5 && !showAll;
-    
-    if (hasMore) {
-      response += `\n...and ${data.count - 5} more results.`;
-    }
-
-    return {
-      content: response,
-      hasMore,
-      fullData: data
-    };
-  };
-
-  const handleSeeMore = (messageId, fullData, system, query) => {
-    const formattedResponse = formatApiResponse(fullData, system, query, true);
-    
-    setMessages(prev => prev.map(msg => 
-      msg.id === messageId 
-        ? { ...msg, content: formattedResponse.content, hasMore: false }
-        : msg
-    ));
-  };
-
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!inputValue.trim()) return;
 
     const userMessage = {
@@ -360,95 +279,16 @@ const AIChatbot = () => {
 
     setMessages(prev => [...prev, userMessage]);
 
-    // Determine which API to call based on user input
-    let apiUrl = '';
-    let system = '';
-    const lowercaseInput = inputValue.toLowerCase();
-
-    // Update context based on user input
-    if (lowercaseInput.includes('ayurveda') || lowercaseInput.includes('ayurved')) {
-      setContext({ lastSystem: 'ayurveda' });
-      system = 'ayurveda';
-      const query = inputValue.replace(/ayurveda|ayurved/gi, '').trim() || 'disease';
-      apiUrl = `${API_BASE_URL}/terminologies/ayurveda/search/?q=${encodeURIComponent(query)}`;
-    } else if (lowercaseInput.includes('siddha')) {
-      setContext({ lastSystem: 'siddha' });
-      system = 'siddha';
-      const query = inputValue.replace(/siddha/gi, '').trim() || 'disease';
-      apiUrl = `${API_BASE_URL}/terminologies/siddha/search/?q=${encodeURIComponent(query)}`;
-    } else if (lowercaseInput.includes('unani')) {
-      setContext({ lastSystem: 'unani' });
-      system = 'unani';
-      const query = inputValue.replace(/unani/gi, '').trim() || 'disease';
-      apiUrl = `${API_BASE_URL}/terminologies/unani/search/?q=${encodeURIComponent(query)}`;
-    } else if (lowercaseInput.includes('icd') || lowercaseInput.includes('icd-11')) {
-      setContext({ lastSystem: 'icd11' });
-      system = 'icd11';
-      const query = inputValue.replace(/icd|icd-11/gi, '').trim() || 'disease';
-      apiUrl = `${API_BASE_URL}/terminologies/icd11/search/?q=${encodeURIComponent(query)}&fuzzy=true&threshold=0.3`;
-    } else if (lowercaseInput.includes('mapping') || lowercaseInput.includes('map')) {
-      system = 'mappings';
-      let medicalSystem = context.lastSystem || 'ayurveda';
-      if (lowercaseInput.includes('siddha')) medicalSystem = 'siddha';
-      if (lowercaseInput.includes('unani')) medicalSystem = 'unani';
-      
-      const query = inputValue.replace(/mapping|map|siddha|unani|ayurveda/gi, '').trim() || 'fever';
-      apiUrl = `${API_BASE_URL}/terminologies/mappings/?system=${medicalSystem}&q=${encodeURIComponent(query)}&min_confidence=0.1`;
-    } else if (context.lastSystem) {
-      // Use context if no specific system mentioned
-      system = context.lastSystem;
-      const query = inputValue.trim() || 'disease';
-      apiUrl = `${API_BASE_URL}/terminologies/${system}/search/?q=${encodeURIComponent(query)}`;
-    }
-
-    // If a specific API call is identified
-    if (apiUrl) {
-      setMessages(prev => [...prev, {
-        id: Date.now().toString() + '-loading',
-        content: "Searching for information...",
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = {
+        id: (Date.now() + 1).toString(),
+        content: getBotResponse(inputValue),
         sender: "bot",
         timestamp: new Date(),
-      }]);
-
-      const data = await fetchData(apiUrl);
-      
-      // Remove loading message
-      setMessages(prev => prev.filter(msg => msg.id !== (Date.now().toString() + '-loading')));
-      
-      if (data) {
-        const formattedResponse = formatApiResponse(data, system, inputValue);
-        const botResponse = {
-          id: (Date.now() + 1).toString(),
-          content: formattedResponse.content,
-          sender: "bot",
-          timestamp: new Date(),
-          hasMore: formattedResponse.hasMore,
-          fullData: formattedResponse.fullData,
-          system: system,
-          query: inputValue
-        };
-        setMessages(prev => [...prev, botResponse]);
-      } else {
-        const errorResponse = {
-          id: (Date.now() + 1).toString(),
-          content: "Sorry, I couldn't retrieve the information at this time. Please try again later.",
-          sender: "bot",
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, errorResponse]);
-      }
-    } else {
-      // General question - use the existing knowledge base
-      setTimeout(() => {
-        const botResponse = {
-          id: (Date.now() + 1).toString(),
-          content: getBotResponse(inputValue),
-          sender: "bot",
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, botResponse]);
-      }, 1000);
-    }
+      };
+      setMessages(prev => [...prev, botResponse]);
+    }, 1000);
 
     setInputValue("");
   };
@@ -623,7 +463,7 @@ const AIChatbot = () => {
       "hi": "Hi there! What would you like to know about our APIs?",
       "thanks": "You're welcome! Is there anything else I can help you with?",
       "thank you": "You're welcome! Let me know if you need more assistance.",
-      "what can you do": "I can help you understand API endpoints, response formats, search parameters, and how to integrate our traditional medicine APIs into your applications.",
+      "what can you do": "I can help you understand API endpoints, response formats, search parameters, and how to integrate our traditional medicine APIs into your applications. I can also search for specific disease codes in Ayurveda, Siddha, Unani, and ICD-11 systems.",
       "who are you": "I'm an AI assistant for the Traditional Medicine API documentation. I can answer questions about our APIs and help you get started.",
       "how are you": "I'm functioning well, thank you! Ready to help you with any API questions you might have.",
     };
@@ -636,7 +476,7 @@ const AIChatbot = () => {
     }
     
     // Default response for unrecognized queries
-    return "I can help you understand the API endpoints, response formats, and how to use the search parameters. Try asking about specific APIs like Ayurveda, Siddha, Unani, ICD-11, or Mappings. You can also ask about authentication, rate limits, or code examples.";
+    return "I can help you understand the API endpoints, response formats, and how to use the search parameters. Try asking about specific APIs like Ayurveda, Siddha, Unani, ICD-11, or Mappings. You can also ask about authentication, rate limits, or code examples. To search for specific diseases, try phrases like 'search for fever in Ayurveda' or 'find diabetes in ICD-11'.";
   };
 
   const handleQuickAction = (action) => {
