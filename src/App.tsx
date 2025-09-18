@@ -267,7 +267,115 @@ const AIChatbot = () => {
     "What are the common search parameters?",
   ];
 
-  const handleSendMessage = () => {
+  // Function to fetch data from API endpoints
+  const fetchData = async (url) => {
+<<<<<<< HEAD
+    // Check cache first
+    if (cache[url]) {
+      return cache[url];
+    }
+
+=======
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+<<<<<<< HEAD
+      const data = await response.json();
+      
+      // Cache the response
+      setCache(prevCache => ({
+        ...prevCache,
+        [url]: data
+      }));
+      
+      return data;
+=======
+      return await response.json();
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
+  };
+
+<<<<<<< HEAD
+  // Function to format API response for display with pagination
+  const formatApiResponse = (data, system, query, showAll = false) => {
+    if (!data || !data.results || data.results.length === 0) {
+      return {
+        content: `No results found for "${query}" in ${system}.`,
+        hasMore: false,
+        fullData: null
+      };
+    }
+
+    let response = `Found ${data.count} result(s) for "${query}" in ${system}:\n\n`;
+    const itemsToShow = showAll ? data.results : data.results.slice(0, 5);
+    
+    itemsToShow.forEach((item, index) => {
+=======
+  // Function to format API response for display
+  const formatApiResponse = (data, system, query) => {
+    if (!data || !data.results || data.results.length === 0) {
+      return `No results found for "${query}" in ${system}.`;
+    }
+
+    let response = `Found ${data.count} result(s) for "${query}" in ${system}:\n\n`;
+    
+    data.results.slice(0, 5).forEach((item, index) => {
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+      response += `${index + 1}. `;
+      
+      if (system === 'ayurveda') {
+        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Hindi: ${item.hindi_name || 'N/A'}\n`;
+      } else if (system === 'siddha') {
+        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Tamil: ${item.tamil_name || 'N/A'}\n`;
+      } else if (system === 'unani') {
+        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Arabic: ${item.arabic_name || 'N/A'}\n`;
+      } else if (system === 'icd11') {
+        response += `Code: ${item.code || 'N/A'}, Title: ${item.title || 'N/A'}\n`;
+      } else if (system === 'mappings') {
+        if (item.source_term && item.icd_mapping) {
+          response += `Term: ${item.source_term.english_name || 'N/A'} (${item.source_term.code || 'N/A'}) → ICD-11: ${item.icd_mapping.code || 'N/A'} (${item.icd_mapping.title || 'N/A'}), Confidence: ${(item.confidence_score * 100).toFixed(1)}%\n`;
+        }
+      }
+    });
+
+<<<<<<< HEAD
+    const hasMore = data.count > 5 && !showAll;
+    
+    if (hasMore) {
+      response += `\n...and ${data.count - 5} more results.`;
+    }
+
+    return {
+      content: response,
+      hasMore,
+      fullData: data
+    };
+  };
+
+  const handleSeeMore = (messageId, fullData, system, query) => {
+    const formattedResponse = formatApiResponse(fullData, system, query, true);
+    
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, content: formattedResponse.content, hasMore: false }
+        : msg
+    ));
+=======
+    if (data.count > 5) {
+      response += `\n...and ${data.count - 5} more results.`;
+    }
+
+    return response;
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+  };
+
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
     const userMessage = {
@@ -279,16 +387,121 @@ const AIChatbot = () => {
 
     setMessages(prev => [...prev, userMessage]);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse = {
-        id: (Date.now() + 1).toString(),
-        content: getBotResponse(inputValue),
+    // Determine which API to call based on user input
+    let apiUrl = '';
+    let system = '';
+    const lowercaseInput = inputValue.toLowerCase();
+
+<<<<<<< HEAD
+    // Update context based on user input
+    if (lowercaseInput.includes('ayurveda') || lowercaseInput.includes('ayurved')) {
+      setContext({ lastSystem: 'ayurveda' });
+=======
+    if (lowercaseInput.includes('ayurveda') || lowercaseInput.includes('ayurved')) {
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+      system = 'ayurveda';
+      const query = inputValue.replace(/ayurveda|ayurved/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/ayurveda/search/?q=${encodeURIComponent(query)}`;
+    } else if (lowercaseInput.includes('siddha')) {
+<<<<<<< HEAD
+      setContext({ lastSystem: 'siddha' });
+=======
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+      system = 'siddha';
+      const query = inputValue.replace(/siddha/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/siddha/search/?q=${encodeURIComponent(query)}`;
+    } else if (lowercaseInput.includes('unani')) {
+<<<<<<< HEAD
+      setContext({ lastSystem: 'unani' });
+=======
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+      system = 'unani';
+      const query = inputValue.replace(/unani/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/unani/search/?q=${encodeURIComponent(query)}`;
+    } else if (lowercaseInput.includes('icd') || lowercaseInput.includes('icd-11')) {
+<<<<<<< HEAD
+      setContext({ lastSystem: 'icd11' });
+=======
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+      system = 'icd11';
+      const query = inputValue.replace(/icd|icd-11/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/icd11/search/?q=${encodeURIComponent(query)}&fuzzy=true&threshold=0.3`;
+    } else if (lowercaseInput.includes('mapping') || lowercaseInput.includes('map')) {
+      system = 'mappings';
+<<<<<<< HEAD
+      let medicalSystem = context.lastSystem || 'ayurveda';
+=======
+      let medicalSystem = 'ayurveda';
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+      if (lowercaseInput.includes('siddha')) medicalSystem = 'siddha';
+      if (lowercaseInput.includes('unani')) medicalSystem = 'unani';
+      
+      const query = inputValue.replace(/mapping|map|siddha|unani|ayurveda/gi, '').trim() || 'fever';
+      apiUrl = `${API_BASE_URL}/terminologies/mappings/?system=${medicalSystem}&q=${encodeURIComponent(query)}&min_confidence=0.1`;
+<<<<<<< HEAD
+    } else if (context.lastSystem) {
+      // Use context if no specific system mentioned
+      system = context.lastSystem;
+      const query = inputValue.trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/${system}/search/?q=${encodeURIComponent(query)}`;
+=======
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+    }
+
+    // If a specific API call is identified
+    if (apiUrl) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString() + '-loading',
+        content: "Searching for information...",
         sender: "bot",
         timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, botResponse]);
-    }, 1000);
+      }]);
+
+      const data = await fetchData(apiUrl);
+      
+      // Remove loading message
+      setMessages(prev => prev.filter(msg => msg.id !== (Date.now().toString() + '-loading')));
+      
+      if (data) {
+        const formattedResponse = formatApiResponse(data, system, inputValue);
+        const botResponse = {
+          id: (Date.now() + 1).toString(),
+<<<<<<< HEAD
+          content: formattedResponse.content,
+          sender: "bot",
+          timestamp: new Date(),
+          hasMore: formattedResponse.hasMore,
+          fullData: formattedResponse.fullData,
+          system: system,
+          query: inputValue
+=======
+          content: formattedResponse,
+          sender: "bot",
+          timestamp: new Date(),
+>>>>>>> 5dafdf3545dc116c736338c5a19b896f4ae52a1f
+        };
+        setMessages(prev => [...prev, botResponse]);
+      } else {
+        const errorResponse = {
+          id: (Date.now() + 1).toString(),
+          content: "Sorry, I couldn't retrieve the information at this time. Please try again later.",
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, errorResponse]);
+      }
+    } else {
+      // General question - use the existing knowledge base
+      setTimeout(() => {
+        const botResponse = {
+          id: (Date.now() + 1).toString(),
+          content: getBotResponse(inputValue),
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, botResponse]);
+      }, 1000);
+    }
 
     setInputValue("");
   };
