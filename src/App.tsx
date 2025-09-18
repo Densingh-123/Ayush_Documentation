@@ -259,13 +259,60 @@ const AIChatbot = () => {
   }, [messages]);
 
   const quickActions = [
-    "How do I search Ayurveda terms?",
-    "What is the structure of ICD-11 responses?",
-    "How to use the mappings API?",
+    "Search for fever in Ayurveda",
+    "Find diabetes in ICD-11",
+    "Show me mappings for headache",
     "What are the common search parameters?",
   ];
 
-  const handleSendMessage = () => {
+  // Function to fetch data from API endpoints
+  const fetchData = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
+  };
+
+  // Function to format API response for display
+  const formatApiResponse = (data, system, query) => {
+    if (!data || !data.results || data.results.length === 0) {
+      return `No results found for "${query}" in ${system}.`;
+    }
+
+    let response = `Found ${data.count} result(s) for "${query}" in ${system}:\n\n`;
+    
+    data.results.slice(0, 5).forEach((item, index) => {
+      response += `${index + 1}. `;
+      
+      if (system === 'ayurveda') {
+        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Hindi: ${item.hindi_name || 'N/A'}\n`;
+      } else if (system === 'siddha') {
+        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Tamil: ${item.tamil_name || 'N/A'}\n`;
+      } else if (system === 'unani') {
+        response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Arabic: ${item.arabic_name || 'N/A'}\n`;
+      } else if (system === 'icd11') {
+        response += `Code: ${item.code || 'N/A'}, Title: ${item.title || 'N/A'}\n`;
+      } else if (system === 'mappings') {
+        if (item.source_term && item.icd_mapping) {
+          response += `Term: ${item.source_term.english_name || 'N/A'} (${item.source_term.code || 'N/A'}) → ICD-11: ${item.icd_mapping.code || 'N/A'} (${item.icd_mapping.title || 'N/A'}), Confidence: ${(item.confidence_score * 100).toFixed(1)}%\n`;
+        }
+      }
+    });
+
+    if (data.count > 5) {
+      response += `\n...and ${data.count - 5} more results.`;
+    }
+
+    return response;
+  };
+
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
     const userMessage = {
@@ -277,21 +324,85 @@ const AIChatbot = () => {
 
     setMessages(prev => [...prev, userMessage]);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse = {
-        id: (Date.now() + 1).toString(),
-        content: getBotResponse(inputValue),
+    // Determine which API to call based on user input
+    let apiUrl = '';
+    let system = '';
+    const lowercaseInput = inputValue.toLowerCase();
+
+    if (lowercaseInput.includes('ayurveda') || lowercaseInput.includes('ayurved')) {
+      system = 'ayurveda';
+      const query = inputValue.replace(/ayurveda|ayurved/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/ayurveda/search/?q=${encodeURIComponent(query)}`;
+    } else if (lowercaseInput.includes('siddha')) {
+      system = 'siddha';
+      const query = inputValue.replace(/siddha/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/siddha/search/?q=${encodeURIComponent(query)}`;
+    } else if (lowercaseInput.includes('unani')) {
+      system = 'unani';
+      const query = inputValue.replace(/unani/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/unani/search/?q=${encodeURIComponent(query)}`;
+    } else if (lowercaseInput.includes('icd') || lowercaseInput.includes('icd-11')) {
+      system = 'icd11';
+      const query = inputValue.replace(/icd|icd-11/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/icd11/search/?q=${encodeURIComponent(query)}&fuzzy=true&threshold=0.3`;
+    } else if (lowercaseInput.includes('mapping') || lowercaseInput.includes('map')) {
+      system = 'mappings';
+      let medicalSystem = 'ayurveda';
+      if (lowercaseInput.includes('siddha')) medicalSystem = 'siddha';
+      if (lowercaseInput.includes('unani')) medicalSystem = 'unani';
+      
+      const query = inputValue.replace(/mapping|map|siddha|unani|ayurveda/gi, '').trim() || 'fever';
+      apiUrl = `${API_BASE_URL}/terminologies/mappings/?system=${medicalSystem}&q=${encodeURIComponent(query)}&min_confidence=0.1`;
+    }
+
+    // If a specific API call is identified
+    if (apiUrl) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString() + '-loading',
+        content: "Searching for information...",
         sender: "bot",
         timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, botResponse]);
-    }, 1000);
+      }]);
+
+      const data = await fetchData(apiUrl);
+      
+      // Remove loading message
+      setMessages(prev => prev.filter(msg => msg.id !== (Date.now().toString() + '-loading')));
+      
+      if (data) {
+        const formattedResponse = formatApiResponse(data, system, inputValue);
+        const botResponse = {
+          id: (Date.now() + 1).toString(),
+          content: formattedResponse,
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, botResponse]);
+      } else {
+        const errorResponse = {
+          id: (Date.now() + 1).toString(),
+          content: "Sorry, I couldn't retrieve the information at this time. Please try again later.",
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, errorResponse]);
+      }
+    } else {
+      // General question - use the existing knowledge base
+      setTimeout(() => {
+        const botResponse = {
+          id: (Date.now() + 1).toString(),
+          content: getBotResponse(inputValue),
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, botResponse]);
+      }, 1000);
+    }
 
     setInputValue("");
   };
 
-  // ... (keep the existing getBotResponse function as is)
   const getBotResponse = (input) => {
     const lowercaseInput = input.toLowerCase();
     
@@ -462,7 +573,7 @@ const AIChatbot = () => {
       "hi": "Hi there! What would you like to know about our APIs?",
       "thanks": "You're welcome! Is there anything else I can help you with?",
       "thank you": "You're welcome! Let me know if you need more assistance.",
-      "what can you do": "I can help you understand API endpoints, response formats, search parameters, and how to integrate our traditional medicine APIs into your applications.",
+      "what can you do": "I can help you understand API endpoints, response formats, search parameters, and how to integrate our traditional medicine APIs into your applications. I can also search for specific disease codes in Ayurveda, Siddha, Unani, and ICD-11 systems.",
       "who are you": "I'm an AI assistant for the Traditional Medicine API documentation. I can answer questions about our APIs and help you get started.",
       "how are you": "I'm functioning well, thank you! Ready to help you with any API questions you might have.",
     };
@@ -475,8 +586,9 @@ const AIChatbot = () => {
     }
     
     // Default response for unrecognized queries
-    return "I can help you understand the API endpoints, response formats, and how to use the search parameters. Try asking about specific APIs like Ayurveda, Siddha, Unani, ICD-11, or Mappings. You can also ask about authentication, rate limits, or code examples.";
+    return "I can help you understand the API endpoints, response formats, and how to use the search parameters. Try asking about specific APIs like Ayurveda, Siddha, Unani, ICD-11, or Mappings. You can also ask about authentication, rate limits, or code examples. To search for specific diseases, try phrases like 'search for fever in Ayurveda' or 'find diabetes in ICD-11'.";
   };
+
   const handleQuickAction = (action) => {
     setInputValue(action);
     handleSendMessage();
@@ -564,7 +676,7 @@ const AIChatbot = () => {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask about API endpoints..."
+            placeholder="Ask about API endpoints or search for diseases..."
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
             className="flex-1"
           />
