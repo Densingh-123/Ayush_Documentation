@@ -1,73 +1,279 @@
-# Welcome to your Lovable project
+Traditional Medicine API Documentation Portal
+Overview
+A comprehensive documentation portal for India's traditional medicine terminologies integrated with WHO ICD-11 TM2. This React-based application provides detailed API documentation, testing capabilities, and an AI assistant to help users understand and work with traditional medicine APIs.
 
-## Project info
+Features
+1. Comprehensive API Documentation
+Ayurveda API: Search Ayurvedic medical terminologies with English names, Hindi names, and diacritical representations
 
-**URL**: https://lovable.dev/projects/f4473e7a-f674-45e2-bf0a-1eb9b245b114
+Siddha API: Access Siddha medical terminologies with English names, Tamil names, and romanized representations
 
-## How can I edit this code?
+Unani API: Explore Unani medical terminologies with English names, Arabic names, and romanized representations
 
-There are several ways of editing your application.
+ICD-11 API: Search WHO's International Classification of Diseases codes and terminologies
 
-**Use Lovable**
+Mappings API: Find connections between traditional medicine terminologies and ICD-11 codes with confidence scores
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f4473e7a-f674-45e2-bf0a-1eb9b245b114) and start prompting.
+2. Interactive Testing Playground
+Live API testing interface for all endpoints
 
-Changes made via Lovable will be committed automatically to this repo.
+Real-time response visualization
 
-**Use your preferred IDE**
+Sample queries and parameter examples
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Copy-paste ready code snippets
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. AI-Powered Assistant
+Intelligent chatbot for answering API-related questions
 
-Follow these steps:
+Context-aware responses based on user queries
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Quick action buttons for common questions
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Scrollable chat history with smooth auto-scrolling
 
-# Step 3: Install the necessary dependencies.
-npm i
+4. Detailed System Information
+About Ayurveda: History, principles, and treatment methods
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+About Siddha: Origins, diagnostic methods, and therapies
+
+About Unani: Philosophical foundations and treatment approaches
+
+About ICD-11: WHO standards and traditional medicine integration
+
+5. Analytics Dashboard
+API usage statistics visualization
+
+Success rates monitoring
+
+Popular search terms tracking
+
+Performance metrics
+
+6. User-Friendly Interface
+Dark/light theme support
+
+Responsive design for all devices
+
+Intuitive navigation with sidebar menu
+
+Clean, modern UI with smooth animations
+
+7. Technical Features
+FHIR R4 compliant
+
+India EHR Standards 2016 compatible
+
+OAuth 2.0 ABHA ready
+
+Dual coding system (Traditional Medicine + Biomedicine)
+
+API Endpoints
+Ayurveda Terminology Search
+text
+GET /terminologies/ayurveda/search/?q=query
+Returns Ayurvedic medical terminologies with English names, Hindi names, and diacritical representations.
+
+Siddha Terminology Search
+text
+GET /terminologies/siddha/search/?q=query
+Returns Siddha medical terminologies with English names, Tamil names, and romanized representations.
+
+Unani Terminology Search
+text
+GET /terminologies/unani/search/?q=query
+Returns Unani medical terminologies with English names, Arabic names, and romanized representations.
+
+ICD-11 Terminology Search
+text
+GET /terminologies/icd11/search/?q=query
+Returns ICD-11 medical codes and terminologies with detailed information.
+
+Mappings Search
+text
+GET /terminologies/mappings/?system=system&q=query&min_confidence=0.1
+Finds mappings between traditional medicine terminologies and ICD-11 codes with confidence scores.
+
+Data Coverage
+4,500+ Ayurveda terms
+
+1,200+ Siddha terms
+
+1,800+ Unani terms
+
+529 ICD-11 TM2 codes
+
+Comprehensive mappings between systems
+
+Getting Started
+Prerequisites
+Node.js (v14 or higher)
+
+npm or yarn
+
+API server running on http://localhost:8000
+
+Installation
+Clone the repository:
+
+bash
+git clone <repository-url>
+cd api-documentation-portal
+Install dependencies:
+
+bash
+npm install
+Start the development server:
+
+bash
 npm run dev
-```
+Open your browser and navigate to http://localhost:3000
 
-**Edit a file directly in GitHub**
+Building for Production
+bash
+npm run build
+npm start
+Usage Examples
+Searching for Terms
+Navigate to the desired API section (Ayurveda, Siddha, Unani, or ICD-11)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Enter a search term in the input field
 
-**Use GitHub Codespaces**
+View the formatted API response with codes and translations
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Testing API Endpoints
+Visit the Testing Playground
 
-## What technologies are used for this project?
+Select an endpoint from the dropdown
 
-This project is built with:
+Enter optional parameters
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Click "Test Endpoint" to see live results
 
-## How can I deploy this project?
+Using the AI Assistant
+Click the chat icon in the bottom-right corner
 
-Simply open [Lovable](https://lovable.dev/projects/f4473e7a-f674-45e2-bf0a-1eb9b245b114) and click on Share -> Publish.
+Ask questions about:
 
-## Can I connect a custom domain to my Lovable project?
+API endpoints and parameters
 
-Yes, you can!
+Response formats
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Specific disease codes
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+System integrations
+
+Authentication and rate limits
+
+Technology Stack
+Frontend Framework: React with TypeScript
+
+UI Library: shadcn/ui with Tailwind CSS
+
+Routing: React Router
+
+Animations: Framer Motion
+
+Icons: Lucide React
+
+API Client: Native Fetch API
+
+Build Tool: Vite
+
+Key Components
+Header: Navigation and theme toggle
+
+Sidebar: Main navigation menu
+
+AIChatbot: Interactive assistant with API integration
+
+ApiTestingComponent: Live API testing interface
+
+HeroSection: Landing page introduction
+
+ApiResponseDisplay: formatted API response viewer
+
+API Integration
+The application integrates with a backend API server running on http://localhost:8000 with the following endpoints:
+
+Ayurveda: /terminologies/ayurveda/search/
+
+Siddha: /terminologies/siddha/search/
+
+Unani: /terminologies/unani/search/
+
+ICD-11: /terminologies/icd11/search/
+
+Mappings: /terminologies/mappings/
+
+Customization
+Adding New API Endpoints
+Create a new page component in src/components/pages/
+
+Add route in App.tsx
+
+Update sidebar navigation items
+
+Add API integration logic following existing patterns
+
+Modifying Styling
+Global styles: src/index.css
+
+Component-specific styles: Tailwind CSS classes in components
+
+Theme customization: Modify src/components/theme-provider.tsx
+
+Extending AI Knowledge Base
+Edit the getBotResponse function in the AIChatbot component to add new question-answer pairs and API integration logic.
+
+Performance Features
+Lazy loading of components
+
+Optimized re-renders with React hooks
+
+Efficient API call management
+
+Smooth animations with Framer Motion
+
+Responsive design for all screen sizes
+
+Browser Support
+Chrome (latest)
+
+Firefox (latest)
+
+Safari (latest)
+
+Edge (latest)
+
+Contributing
+Fork the repository
+
+Create a feature branch
+
+Make your changes
+
+Add tests if applicable
+
+Submit a pull request
+
+License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+Support
+For technical support or questions about the API documentation:
+
+Email: support@tradmedapi.com
+
+Documentation: API Documentation Portal
+
+Issues: GitHub Issues page
+
+Acknowledgments
+Ministry of AYUSH for traditional medicine data
+
+World Health Organization for ICD-11 standards
+
+shadcn/ui for the component library
+
+React community for excellent tools and resources
