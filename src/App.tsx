@@ -792,7 +792,7 @@ const HeroSection = () => {
             transition={{ duration: 0.8 }}
             className="flex justify-center mb-6"
           >
-            <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-1">
+            <Badge className="bg-blue-500/10 text-white-500 border-blue-500/20 px-4 py-1">
               FHIR R4 Compliant • ICD-11 TM2 • India EHR Standards 2016
             </Badge>
           </motion.div>
