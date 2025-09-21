@@ -100,35 +100,45 @@ const Header = () => {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all ${isScrolled ? "shadow-md" : ""}`}>
-      <div className="container flex h-16 items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <Code className="h-5 w-5 text-white" />
-            </div>
-            <h1 className="text-xl font-bold">Ayush Bandhan API Documentation</h1>
-          </Link>
-          <Badge variant="secondary" className="hidden sm:flex">
-            v1.0.0
-          </Badge>
-        </div>
-        
-        <nav className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="h-9 w-9 px-0"
-          >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-  
-        </nav>
-      </div>
-    </header>
+<header
+  className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all ${
+    isScrolled ? "shadow-md" : ""
+  }`}
+>
+  <div className="flex h-20 items-center justify-between px-4">
+  {/* Left Section: Logo + Title */}
+  <div className="flex items-center gap-4">
+    <Link to="/" className="flex items-center gap-2">
+      <img
+        src="/logo.png"
+        alt="Logo"
+        className="h-14 w-14 object-contain"
+      />
+      <h1 className="text-2xl font-bold italic text-[#1e88e5]">
+        Ayush Bandhan API Documentation
+      </h1>
+    </Link>
+  </div>
+
+    {/* Right Section: Theme Toggle */}
+    <nav className="flex items-center gap-4">
+      <Badge variant="secondary" className="hidden sm:flex">
+        v1.0.0
+      </Badge>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        className="h-9 w-9 px-0"
+      >
+        <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    </nav>
+  </div>
+</header>
+
   );
 };
 
@@ -149,19 +159,9 @@ const Sidebar = () => {
       icon: <Database className="h-4 w-4" />
     },
     {
-      title: "About Ayurveda",
-      href: "/about-ayurveda",
-      icon: <FileText className="h-4 w-4" />
-    },
-    {
       title: "Siddha API",
       href: "/siddha",
       icon: <Database className="h-4 w-4" />
-    },
-    {
-      title: "About Siddha",
-      href: "/about-siddha",
-      icon: <FileText className="h-4 w-4" />
     },
     {
       title: "Unani API",
@@ -169,34 +169,19 @@ const Sidebar = () => {
       icon: <Database className="h-4 w-4" />
     },
     {
-      title: "About Unani",
-      href: "/about-unani",
-      icon: <FileText className="h-4 w-4" />
-    },
-    {
       title: "ICD-11 API",
       href: "/icd11",
       icon: <Database className="h-4 w-4" />
     },
     {
-      title: "About ICD-11",
-      href: "/about-icd11",
-      icon: <FileText className="h-4 w-4" />
-    },
-    {
-      title: "Mappings API",
-      href: "/mappings",
-      icon: <Database className="h-4 w-4" />
+      title: "Mappings & Testing",
+      href: "/mappings-testing",
+      icon: <Code className="h-4 w-4" />
     },
     {
       title: "All Endpoints",
       href: "/all-endpoints",
       icon: <Database className="h-4 w-4" />
-    },
-    {
-      title: "Testing Playground",
-      href: "/playground",
-      icon: <Code className="h-4 w-4" />
     },
     {
       title: "Analytics",
@@ -781,10 +766,11 @@ const HeroSection = () => {
   return (
     <section className="relative py-20 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/50 to-background"></div>
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMjkuNSIgY3k9IjI5LjUiIHI9IjEuNSIvPjwvZz48L2c+PC9zdmc+')] opacity-50"></div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMorgLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMjkuNSIgY3k9IjI5LjUiIHI9IjEuNSIvPjwvZz48L2c+PC9zdmc+')] opacity-50"></div>
       
-      <div className="container relative z-10 px-6">
+      <div className="container relative z-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
+            
           <motion.div
             ref={ref}
             initial={{ opacity: 0, y: 20 }}
@@ -792,6 +778,7 @@ const HeroSection = () => {
             transition={{ duration: 0.8 }}
             className="flex justify-center mb-6"
           >
+        
             <Badge className="bg-blue-500/10 text-white-500 border-blue-500/20 px-4 py-1">
               FHIR R4 Compliant • ICD-11 TM2 • India EHR Standards 2016
             </Badge>
@@ -801,7 +788,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent leading-tight"
+            className="text-5xl font-bold mb-6 colors-primary text-[#1e88e5] italic"
           >
             NAMASTE & ICD-11 Integration API
           </motion.h1>
@@ -821,6 +808,7 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex items-center justify-center gap-4 mb-12 flex-wrap"
           >
+            
             <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
               Get Started
             </Button>
@@ -840,19 +828,19 @@ const HeroSection = () => {
               <CardContent className="p-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                   <div>
-                    <div className="text-2xl font-bold text-blue-500 mb-2">4,500+</div>
+                    <div className="text-2xl font-bold mb-2">4,500+</div>
                     <div className="text-sm text-muted-foreground">Ayurveda Terms</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-purple-500 mb-2">1,200+</div>
+                    <div className="text-2xl font-bold mb-2">1,200+</div>
                     <div className="text-sm text-muted-foreground">Siddha Terms</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-green-500 mb-2">1,800+</div>
+                    <div className="text-2xl font-bold mb-2">1,800+</div>
                     <div className="text-sm text-muted-foreground">Unani Terms</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-orange-500 mb-2">529</div>
+                    <div className="text-2xl font-bold mb-2">529</div>
                     <div className="text-sm text-muted-foreground">ICD-11 TM2 Codes</div>
                   </div>
                 </div>
@@ -990,33 +978,39 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
   );
 };
 
-// About Ayurveda Page Component
-const AboutAyurvedaPage = () => {
+// Ayurveda Page Component (Combined with About Ayurveda)
+const AyurvedaPage = () => {
   return (
-    <div className="container px-6 py-8 max-w-4xl">
+    <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">About Ayurveda Medicine</h2>
+        <h2 className="text-3xl font-bold mb-4">Ayurveda Terminology API</h2>
         <p className="text-muted-foreground">
-          Ayurveda is one of the world's oldest holistic healing systems, developed more than 3,000 years ago in India.
-          It's based on the belief that health and wellness depend on a delicate balance between the mind, body, and spirit.
+          Search and explore Ayurveda medical terminologies with detailed information including English names, Hindi names, and diacritical representations.
         </p>
       </div>
       
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Ayurveda API Endpoint</CardTitle>
-          <p className="text-muted-foreground">Access Ayurveda medical terminologies through our API</p>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted p-4 rounded-lg mb-6">
-            <code className="text-sm">GET {API_BASE_URL}/terminologies/ayurveda/search/?q=query</code>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <ApiTestingComponent
+            endpoint={`${API_BASE_URL}/terminologies/ayurveda/search/?q=`}
+            title="Search Ayurveda Terms"
+            description="Search Ayurveda terminologies by disease names, symptoms, or conditions."
+          />
           
-          <h4 className="font-medium mb-3">Sample Response Data</h4>
-          <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
-            <pre className="text-sm text-white">
-              <code>
-{`{
+          <Card className="mb-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <Database className="h-5 w-5 mr-2 text-blue-500" />
+                Response Structure
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Success Response</h4>
+                  <div className="bg-muted p-3 rounded text-sm">
+                    <code>
+                      {`{
   "count": 283,
   "next": "http://localhost:8000/terminologies/ayurveda/search/?page=2&q=diseane",
   "previous": null,
@@ -1028,90 +1022,133 @@ const AboutAyurvedaPage = () => {
       "hindi_name": "विकारः",
       "diacritical_name": "vikāraḥ"
     },
-    {
-      "id": 1792,
-      "code": "J",
-      "english_name": "ear diseases",
-      "hindi_name": "कर्णरोगः",
-      "diacritical_name": ""
-    },
-    {
-      "id": 1746,
-      "code": "I",
-      "english_name": "nose diseases",
-      "hindi_name": "नासारोगः",
-      "diacritical_name": ""
-    }
+    ...
   ]
 }`}
-              </code>
-            </pre>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Key Principles</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Based on five fundamental elements: space, air, fire, water, and earth</li>
-              <li>• Three doshas: Vata, Pitta, and Kapha</li>
-              <li>• Focus on preventive healthcare</li>
-              <li>• Holistic approach to treatment</li>
-              <li>• Use of natural herbs and minerals</li>
-            </ul>
-          </CardContent>
-        </Card>
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                Field Descriptions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Response Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">count</span> - Total number of results</li>
+                    <li><span className="font-medium">next</span> - URL for next page of results</li>
+                    <li><span className="font-medium">previous</span> - URL for previous page of results</li>
+                    <li><span className="font-medium">results</span> - Array of terminology objects</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">id</span> - Unique identifier</li>
+                    <li><span className="font-medium">code</span> - Terminology code</li>
+                    <li><span className="font-medium">english_name</span> - English name</li>
+                    <li><span className="font-medium">hindi_name</span> - Hindi name</li>
+                    <li><span className="font-medium">diacritical_name</span> - Diacritical representation</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Common Treatments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Herbal medicines</li>
-              <li>• Dietary changes</li>
-              <li>• Yoga and meditation</li>
-              <li>• Panchakarma detoxification</li>
-              <li>• Massage therapies</li>
-            </ul>
-          </CardContent>
-        </Card>
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>About Ayurveda Medicine</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Ayurveda is one of the world's oldest holistic healing systems, developed more than 3,000 years ago in India.
+                It's based on the belief that health and wellness depend on a delicate balance between the mind, body, and spirit.
+              </p>
+              
+              <div className="grid grid-cols-1 gap-6 mt-6">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Key Principles</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Based on five fundamental elements: space, air, fire, water, and earth</li>
+                      <li>• Three doshas: Vata, Pitta, and Kapha</li>
+                      <li>• Focus on preventive healthcare</li>
+                      <li>• Holistic approach to treatment</li>
+                      <li>• Use of natural herbs and minerals</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Common Treatments</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Herbal medicines</li>
+                      <li>• Dietary changes</li>
+                      <li>• Yoga and meditation</li>
+                      <li>• Panchakarma detoxification</li>
+                      <li>• Massage therapies</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
 };
 
-// About Siddha Page Component
-const AboutSiddhaPage = () => {
+// Siddha Page Component (Combined with About Siddha)
+const SiddhaPage = () => {
   return (
-    <div className="container px-6 py-8 max-w-4xl">
+    <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">About Siddha Medicine</h2>
+        <h2 className="text-3xl font-bold mb-4">Siddha Terminology API</h2>
         <p className="text-muted-foreground">
-          Siddha medicine is one of the oldest medical systems in India, originating from Tamil Nadu.
-          It emphasizes the importance of physical, mental, and spiritual well-being.
+          Explore Siddha medical terminologies with English names, Tamil names, and romanized representations.
         </p>
       </div>
       
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Siddha API Endpoint</CardTitle>
-          <p className="text-muted-foreground">Access Siddha medical terminologies through our API</p>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted p-4 rounded-lg mb-6">
-            <code className="text-sm">GET {API_BASE_URL}/terminologies/siddha/search/?q=query</code>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <ApiTestingComponent
+            endpoint={`${API_BASE_URL}/terminologies/siddha/search/?q=`}
+            title="Search Siddha Terms"
+            description="Search Siddha terminologies by disease names, symptoms, or conditions."
+          />
           
-          <h4 className="font-medium mb-3">Sample Response Data</h4>
-          <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
-            <pre className="text-sm text-white">
-              <code>
-{`{
+          <Card className="mb-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <Database className="h-5 w-5 mr-2 text-purple-500" />
+                Response Structure
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Success Response</h4>
+                  <div className="bg-muted p-3 rounded text-sm">
+                    <code>
+                      {`{
   "count": 138,
   "next": "http://localhost:8000/terminologies/siddha/search/?page=2&q=diseane",
   "previous": null,
@@ -1123,90 +1160,133 @@ const AboutSiddhaPage = () => {
       "tamil_name": "நோய்",
       "romanized_name": "Disorder"
     },
-    {
-      "id": 1503,
-      "code": "UB",
-      "english_name": "Gum disease",
-      "tamil_name": "பல்லடி நோய்கள்",
-      "romanized_name": "PallaṭI Nōykaḷ"
-    },
-    {
-      "id": 761,
-      "code": "N",
-      "english_name": "Eye diseases",
-      "tamil_name": "கண் நோய்கள்",
-      "romanized_name": "Kaṇ Nōykaḷ"
-    }
+    ...
   ]
 }`}
-              </code>
-            </pre>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Key Principles</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Based on five elements: earth, water, fire, air, and ether</li>
-              <li>• Three humors: Vatham, Pitham, and Kapham</li>
-              <li>• Focus on eight diagnostic methods</li>
-              <li>• Use of metals and minerals in medicine</li>
-              <li>• Spiritual practices for healing</li>
-            </ul>
-          </CardContent>
-        </Card>
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-purple-500" />
+                Field Descriptions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Response Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">count</span> - Total number of results</li>
+                    <li><span className="font-medium">next</span> - URL for next page of results</li>
+                    <li><span className="font-medium">previous</span> - URL for previous page of results</li>
+                    <li><span className="font-medium">results</span> - Array of terminology objects</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">id</span> - Unique identifier</li>
+                    <li><span className="font-medium">code</span> - Terminology code</li>
+                    <li><span className="font-medium">english_name</span> - English name</li>
+                    <li><span className="font-medium">tamil_name</span> - Tamil name</li>
+                    <li><span className="font-medium">romanized_name</span> - Romanized representation</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Common Treatments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Herbal preparations</li>
-              <li>• Mineral-based medicines</li>
-              <li>• Yoga and meditation</li>
-              <li>• Dietary regulations</li>
-              <li>• Spiritual practices</li>
-            </ul>
-          </CardContent>
-        </Card>
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>About Siddha Medicine</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Siddha medicine is one of the oldest medical systems in India, originating from Tamil Nadu.
+                It emphasizes the importance of physical, mental, and spiritual well-being.
+              </p>
+              
+              <div className="grid grid-cols-1 gap-6 mt-6">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Key Principles</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Based on five elements: earth, water, fire, air, and ether</li>
+                      <li>• Three humors: Vatham, Pitham, and Kapham</li>
+                      <li>• Focus on eight diagnostic methods</li>
+                      <li>• Use of metals and minerals in medicine</li>
+                      <li>• Spiritual practices for healing</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Common Treatments</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Herbal preparations</li>
+                      <li>• Mineral-based medicines</li>
+                      <li>• Yoga and meditation</li>
+                      <li>• Dietary regulations</li>
+                      <li>• Spiritual practices</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
 };
 
-// About Unani Page Component
-const AboutUnaniPage = () => {
+// Unani Page Component (Combined with About Unani)
+const UnaniPage = () => {
   return (
-    <div className="container px-6 py-8 max-w-4xl">
+    <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">About Unani Medicine</h2>
+        <h2 className="text-3xl font-bold mb-4">Unani Terminology API</h2>
         <p className="text-muted-foreground">
-          Unani medicine is a traditional system of medicine that originated in Greece and was developed further by Arab and Persian physicians.
-          It is based on the concept of the four humors: blood, phlegm, yellow bile, and black bile.
+          Explore Unani medical terminologies with English names, Arabic names, and romanized representations.
         </p>
       </div>
       
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Unani API Endpoint</CardTitle>
-          <p className="text-muted-foreground">Access Unani medical terminologies through our API</p>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted p-4 rounded-lg mb-6">
-            <code className="text-sm">GET {API_BASE_URL}/terminologies/unani/search/?q=query</code>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <ApiTestingComponent
+            endpoint={`${API_BASE_URL}/terminologies/unani/search/?q=`}
+            title="Search Unani Terms"
+            description="Search Unani terminologies by disease names, symptoms, or conditions."
+          />
           
-          <h4 className="font-medium mb-3">Sample Response Data</h4>
-          <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
-            <pre className="text-sm text-white">
-              <code>
-{`{
+          <Card className="mb-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <Database className="h-5 w-5 mr-2 text-green-500" />
+                Response Structure
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Success Response</h4>
+                  <div className="bg-muted p-3 rounded text-sm">
+                    <code>
+                      {`{
   "count": 139,
   "next": "http://localhost:8000/terminologies/unani/search/?page=2&q=diseane",
   "previous": null,
@@ -1218,90 +1298,134 @@ const AboutUnaniPage = () => {
       "arabic_name": "-",
       "romanized_name": "-"
     },
-    {
-      "id": 2045,
-      "code": "DB",
-      "english_name": "Diseases of lungs",
-      "arabic_name": "امراض ریہ",
-      "romanized_name": "Amrāḍ-i-Ri’a"
-    },
-    {
-      "id": 1378,
-      "code": "O-16",
-      "english_name": "simple disease",
-      "arabic_name": "المرض المفرد",
-      "romanized_name": "Al-Maraḍ al-Mufrad"
-    }
+    ...
   ]
 }`}
-              </code>
-            </pre>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Key Principles</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Based on four humors: blood, phlegm, yellow bile, black bile</li>
-              <li>• Seven physiological principles</li>
-              <li>• Focus on temperament assessment</li>
-              <li>• Use of natural substances</li>
-              <li>• Regimental therapy</li>
-            </ul>
-          </CardContent>
-        </Card>
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-green-500" />
+                Field Descriptions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Response Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">count</span> - Total number of results</li>
+                    <li><span className="font-medium">next</span> - URL for next page of results</li>
+                    <li><span className="font-medium">previous</span> - URL for previous page of results</li>
+                    <li><span className="font-medium">results</span> - Array of terminology objects</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">id</span> - Unique identifier</li>
+                    <li><span className="font-medium">code</span> - Terminology code</li>
+                    <li><span className="font-medium">english_name</span> - English name</li>
+                    <li><span className="font-medium">arabic_name</span> - Arabic name</li>
+                    <li><span className="font-medium">romanized_name</span> - Romanized representation</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Common Treatments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Herbal medicines</li>
-              <li>• Dietotherapy</li>
-              <li>• Regimental therapy (Ilaj-bil-Tadbir)</li>
-              <li>• Surgery (Ilaj-bil-Yad)</li>
-              <li>• Pharmacotherapy (Ilaj-bil-Dawa)</li>
-            </ul>
-          </CardContent>
-        </Card>
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>About Unani Medicine</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Unani medicine is a traditional system of medicine that originated in Greece and was developed further by Arab and Persian physicians.
+                It is based on the concept of the four humors: blood, phlegm, yellow bile, and black bile.
+              </p>
+              
+              <div className="grid grid-cols-1 gap-6 mt-6">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Key Principles</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Based on four humors: blood, phlegm, yellow bile, black bile</li>
+                      <li>• Seven physiological principles</li>
+                      <li>• Focus on temperament assessment</li>
+                      <li>• Use of natural substances</li>
+                      <li>• Regimental therapy</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Common Treatments</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Herbal medicines</li>
+                      <li>• Dietotherapy</li>
+                      <li>• Regimental therapy (Ilaj-bil-Tadbir)</li>
+                      <li>• Surgery (Ilaj-bil-Yad)</li>
+                      <li>• Pharmacotherapy (Ilaj-bil-Dawa)</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
 };
 
-// About ICD-11 Page Component
-const AboutICD11Page = () => {
+// ICD-11 Page Component (Combined with About ICD-11)
+const ICD11Page = () => {
   return (
-    <div className="container px-6 py-8 max-w-4xl">
+    <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">About ICD-11</h2>
+        <h2 className="text-3xl font-bold mb-4">ICD-11 Terminology API</h2>
         <p className="text-muted-foreground">
-          The International Classification of Diseases (ICD) is the global standard for diagnostic health information.
-          ICD-11 is the eleventh revision, which includes a chapter on traditional medicine.
+          Search ICD-11 medical codes and terminologies with detailed information.
         </p>
       </div>
       
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>ICD-11 API Endpoint</CardTitle>
-          <p className="text-muted-foreground">Access ICD-11 medical codes through our API</p>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted p-4 rounded-lg mb-6">
-            <code className="text-sm">GET {API_BASE_URL}/terminologies/icd11/search/?q=query</code>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <ApiTestingComponent
+            endpoint={`${API_BASE_URL}/terminologies/icd11/search/?q=`}
+            title="Search ICD-11 Terms"
+            description="Search ICD-11 terminologies by disease names, symptoms, or conditions."
+            defaultQuery="Diabet"
+          />
           
-          <h4 className="font-medium mb-3">Sample Response Data</h4>
-          <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
-            <pre className="text-sm text-white">
-              <code>
-{`{
+          <Card className="mb-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <Database className="h-5 w-5 mr-2 text-orange-500" />
+                Response Structure
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Success Response</h4>
+                  <div className="bg-muted p-3 rounded text-sm">
+                    <code>
+                      {`{
   "count": 6,
   "next": null,
   "previous": null,
@@ -1312,57 +1436,356 @@ const AboutICD11Page = () => {
       "code": "MG24.0",
       "title": "Fear of cancer"
     },
-    {
-      "id": 17170,
-      "foundation_uri": "http://id.who.int/icd/entity/998223002",
-      "code": "QB20",
-      "title": "Blood donor"
-    },
-    {
-      "id": 19514,
-      "foundation_uri": "http://id.who.int/icd/entity/2062516965",
-      "code": "XA8EC5",
-      "title": "Blood"
-    }
+    ...
   ]
 }`}
-              </code>
-            </pre>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Key Features</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Global standard for health information</li>
-              <li>• Digital-ready design</li>
-              <li>• Multilingual support</li>
-              <li>• Traditional medicine chapter</li>
-              <li>• Regular updates</li>
-            </ul>
-          </CardContent>
-        </Card>
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-orange-500" />
+                Field Descriptions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Response Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">count</span> - Total number of results</li>
+                    <li><span className="font-medium">next</span> - URL for next page of results</li>
+                    <li><span className="font-medium">previous</span> - URL for previous page of results</li>
+                    <li><span className="font-medium">results</span> - Array of terminology objects</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">id</span> - Unique identifier</li>
+                    <li><span className="font-medium">foundation_uri</span> - Foundation URI</li>
+                    <li><span className="font-medium">code</span> - ICD-11 code</li>
+                    <li><span className="font-medium">title</span> - Code title/description</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Traditional Medicine Module</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li>• Chapter 26: Traditional Medicine</li>
-              <li>• Conditions originating from traditional medicine</li>
-              <li>• Pattern-based diagnostics</li>
-              <li>• Integration with modern medicine</li>
-              <li>• Global applicability</li>
-            </ul>
-          </CardContent>
-        </Card>
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>About ICD-11</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                The International Classification of Diseases (ICD) is the global standard for diagnostic health information.
+                ICD-11 is the eleventh revision, which includes a chapter on traditional medicine.
+              </p>
+              
+              <div className="grid grid-cols-1 gap-6 mt-6">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Key Features</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Global standard for health information</li>
+                      <li>• Digital-ready design</li>
+                      <li>• Multilingual support</li>
+                      <li>• Traditional medicine chapter</li>
+                      <li>• Regular updates</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-md">Traditional Medicine Module</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      <li>• Chapter 26: Traditional Medicine</li>
+                      <li>• Conditions originating from traditional medicine</li>
+                      <li>• Pattern-based diagnostics</li>
+                      <li>• Integration with modern medicine</li>
+                      <li>• Global applicability</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
+    </div>
+  );
+};
+
+// Mappings & Testing Page Component
+const MappingsTestingPage = () => {
+  const [system, setSystem] = useState("ayurveda");
+  const [query, setQuery] = useState("fever");
+  const [minConfidence, setMinConfidence] = useState(0.1);
+  const [responseData, setResponseData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedEndpoint, setSelectedEndpoint] = useState("mappings");
+  const [testQuery, setTestQuery] = useState("");
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const url = `${API_BASE_URL}/terminologies/mappings/?system=${system}&q=${query}&min_confidence=${minConfidence}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTest = async () => {
+    if (!testQuery.trim() && selectedEndpoint !== "mappings") return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let url = '';
+      
+      if (selectedEndpoint === "mappings") {
+        url = `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${testQuery || "fever"}&min_confidence=0.1`;
+      } else {
+        const endpoints = {
+          ayurveda: `${API_BASE_URL}/terminologies/ayurveda/search/?q=`,
+          siddha: `${API_BASE_URL}/terminologies/siddha/search/?q=`,
+          unani: `${API_BASE_URL}/terminologies/unani/search/?q=`,
+          icd11: `${API_BASE_URL}/terminologies/icd11/search/?q=`
+        };
+        url = endpoints[selectedEndpoint] + testQuery;
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="px-4 py-8 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold mb-4">Mappings & Testing API</h2>
+        <p className="text-muted-foreground">
+          Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores, and test all API endpoints.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Search Mappings</CardTitle>
+              <p className="text-muted-foreground">Find mappings between traditional medicine systems and ICD-11</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">System</label>
+                  <Select value={system} onValueChange={setSystem}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select system" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ayurveda">Ayurveda</SelectItem>
+                      <SelectItem value="siddha">Siddha</SelectItem>
+                      <SelectItem value="unani">Unani</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Search Query</label>
+                  <Input
+                    placeholder="Enter search term..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Min Confidence</label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    max="1.0"
+                    value={minConfidence}
+                    onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
+                  />
+                </div>
+              </div>
+              
+              <Button onClick={handleSearch} disabled={loading}>
+                {loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                ) : (
+                  <Search className="h-4 w-4 mr-2" />
+                )}
+                Search Mappings
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Test Endpoints</CardTitle>
+              <p className="text-muted-foreground">Select an endpoint and enter parameters to test</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Select Endpoint</label>
+                  <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select endpoint" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
+                      <SelectItem value="siddha">Siddha Search</SelectItem>
+                      <SelectItem value="unani">Unani Search</SelectItem>
+                      <SelectItem value="icd11">ICD-11 Search</SelectItem>
+                      <SelectItem value="mappings">Mappings</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    {selectedEndpoint === "mappings" ? "Search Query (optional)" : "Search Query"}
+                  </label>
+                  <Input
+                    placeholder={
+                      selectedEndpoint === "mappings" 
+                        ? "Enter search term (default: fever)" 
+                        : "Enter search term"
+                    }
+                    value={testQuery}
+                    onChange={(e) => setTestQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleTest()}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <Button onClick={handleTest} disabled={loading}>
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  ) : (
+                    <Code className="h-4 w-4 mr-2" />
+                  )}
+                  Test Endpoint
+                </Button>
+                
+                <div className="text-sm text-muted-foreground">
+                  Endpoint: <code className="bg-muted px-2 py-1 rounded">
+                    {selectedEndpoint === "mappings" 
+                      ? `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${testQuery || "fever"}&min_confidence=0.1`
+                      : `${API_BASE_URL}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
+                    }
+                  </code>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      
+      <ApiResponseDisplay data={responseData} loading={loading} error={error} />
+      
+      {responseData && responseData.results && responseData.results.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-xl font-bold mb-4">Mapping Results</h3>
+          
+          <div className="space-y-4">
+            {responseData.results.map((mapping, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{mapping.source_term.english_name}</CardTitle>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline">{mapping.source_term.code}</Badge>
+                    <Badge variant="secondary">Confidence: {(mapping.confidence_score * 100).toFixed(1)}%</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Source Term</h4>
+                      <div className="bg-muted p-3 rounded text-sm">
+                        <p><span className="font-medium">Code:</span> {mapping.source_term.code}</p>
+                        <p><span className="font-medium">Name:</span> {mapping.source_term.english_name}</p>
+                        {mapping.source_term.hindi_name && (
+                          <p><span className="font-medium">Hindi:</span> {mapping.source_term.hindi_name}</p>
+                        )}
+                        {mapping.source_term.diacritical_name && (
+                          <p><span className="font-medium">Diacritical:</span> {mapping.source_term.diacritical_name}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2">ICD-11 Mapping</h4>
+                      {mapping.icd_mapping ? (
+                        <div className="bg-muted p-3 rounded text-sm">
+                          <p><span className="font-medium">Code:</span> {mapping.icd_mapping.code}</p>
+                          <p><span className="font-medium">Title:</span> {mapping.icd_mapping.title}</p>
+                          <p><span className="font-medium">Similarity:</span> {(mapping.icd_mapping.similarity_score * 100).toFixed(1)}%</p>
+                        </div>
+                      ) : (
+                        <div className="bg-muted p-3 rounded text-sm">
+                          <p className="text-muted-foreground">No ICD-11 mapping available</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1484,7 +1907,7 @@ const AllEndpointsPage = () => {
   ];
 
   return (
-    <div className="container px-6 py-8 max-w-4xl">
+    <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-4">All API Endpoints</h2>
         <p className="text-muted-foreground">
@@ -1523,665 +1946,6 @@ const AllEndpointsPage = () => {
   );
 };
 
-// Ayurveda Page Component
-const AyurvedaPage = () => {
-  return (
-    <div className="container px-6 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Ayurveda Terminology API</h2>
-        <p className="text-muted-foreground">
-          Search and explore Ayurveda medical terminologies with detailed information including English names, Hindi names, and diacritical representations.
-        </p>
-      </div>
-      
-      <ApiTestingComponent
-        endpoint={`${API_BASE_URL}/terminologies/ayurveda/search/?q=`}
-        title="Search Ayurveda Terms"
-        description="Search Ayurveda terminologies by disease names, symptoms, or conditions."
-      />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <Database className="h-5 w-5 mr-2 text-blue-500" />
-              Response Structure
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                <div className="bg-muted p-3 rounded text-sm">
-                  <code>
-                    {`{
-  "count": 283,
-  "next": "http://localhost:8000/terminologies/ayurveda/search/?page=2&q=diseane",
-  "previous": null,
-  "results": [
-    {
-      "id": 2,
-      "code": "DIS",
-      "english_name": "disease/disorder",
-      "hindi_name": "विकारः",
-      "diacritical_name": "vikāraḥ"
-    },
-    ...
-  ]
-}`}
-                  </code>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-blue-500" />
-              Field Descriptions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Response Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">count</span> - Total number of results</li>
-                  <li><span className="font-medium">next</span> - URL for next page of results</li>
-                  <li><span className="font-medium">previous</span> - URL for previous page of results</li>
-                  <li><span className="font-medium">results</span> - Array of terminology objects</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">id</span> - Unique identifier</li>
-                  <li><span className="font-medium">code</span> - Terminology code</li>
-                  <li><span className="font-medium">english_name</span> - English name</li>
-                  <li><span className="font-medium">hindi_name</span> - Hindi name</li>
-                  <li><span className="font-medium">diacritical_name</span> - Diacritical representation</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-// Siddha Page Component
-const SiddhaPage = () => {
-  return (
-    <div className="container px-6 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Siddha Terminology API</h2>
-        <p className="text-muted-foreground">
-          Explore Siddha medical terminologies with English names, Tamil names, and romanized representations.
-        </p>
-      </div>
-      
-      <ApiTestingComponent
-        endpoint={`${API_BASE_URL}/terminologies/siddha/search/?q=`}
-        title="Search Siddha Terms"
-        description="Search Siddha terminologies by disease names, symptoms, or conditions."
-      />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <Database className="h-5 w-5 mr-2 text-purple-500" />
-              Response Structure
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                <div className="bg-muted p-3 rounded text-sm">
-                  <code>
-                    {`{
-  "count": 138,
-  "next": "http://localhost:8000/terminologies/siddha/search/?page=2&q=diseane",
-  "previous": null,
-  "results": [
-    {
-      "id": 2,
-      "code": "DIS",
-      "english_name": "Disorder",
-      "tamil_name": "நோய்",
-      "romanized_name": "Disorder"
-    },
-    ...
-  ]
-}`}
-                  </code>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-purple-500" />
-              Field Descriptions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Response Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">count</span> - Total number of results</li>
-                  <li><span className="font-medium">next</span> - URL for next page of results</li>
-                  <li><span className="font-medium">previous</span> - URL for previous page of results</li>
-                  <li><span className="font-medium">results</span> - Array of terminology objects</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">id</span> - Unique identifier</li>
-                  <li><span className="font-medium">code</span> - Terminology code</li>
-                  <li><span className="font-medium">english_name</span> - English name</li>
-                  <li><span className="font-medium">tamil_name</span> - Tamil name</li>
-                  <li><span className="font-medium">romanized_name</span> - Romanized representation</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-// Unani Page Component
-const UnaniPage = () => {
-  return (
-    <div className="container px-6 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Unani Terminology API</h2>
-        <p className="text-muted-foreground">
-          Explore Unani medical terminologies with English names, Arabic names, and romanized representations.
-        </p>
-      </div>
-      
-      <ApiTestingComponent
-        endpoint={`${API_BASE_URL}/terminologies/unani/search/?q=`}
-        title="Search Unani Terms"
-        description="Search Unani terminologies by disease names, symptoms, or conditions."
-      />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <Database className="h-5 w-5 mr-2 text-green-500" />
-              Response Structure
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                <div className="bg-muted p-3 rounded text-sm">
-                  <code>
-                    {`{
-  "count": 139,
-  "next": "http://localhost:8000/terminologies/unani/search/?page=2&q=diseane",
-  "previous": null,
-  "results": [
-    {
-      "id": 3,
-      "code": "UM-DIS",
-      "english_name": "Disorders",
-      "arabic_name": "-",
-      "romanized_name": "-"
-    },
-    ...
-  ]
-}`}
-                  </code>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-green-500" />
-              Field Descriptions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Response Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">count</span> - Total number of results</li>
-                  <li><span className="font-medium">next</span> - URL for next page of results</li>
-                  <li><span className="font-medium">previous</span> - URL for previous page of results</li>
-                  <li><span className="font-medium">results</span> - Array of terminology objects</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">id</span> - Unique identifier</li>
-                  <li><span className="font-medium">code</span> - Terminology code</li>
-                  <li><span className="font-medium">english_name</span> - English name</li>
-                  <li><span className="font-medium">arabic_name</span> - Arabic name</li>
-                  <li><span className="font-medium">romanized_name</span> - Romanized representation</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-// ICD-11 Page Component
-const ICD11Page = () => {
-  return (
-    <div className="container px-6 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">ICD-11 Terminology API</h2>
-        <p className="text-muted-foreground">
-          Search ICD-11 medical codes and terminologies with detailed information.
-        </p>
-      </div>
-      
-      <ApiTestingComponent
-        endpoint={`${API_BASE_URL}/terminologies/icd11/search/?q=`}
-        title="Search ICD-11 Terms"
-        description="Search ICD-11 terminologies by disease names, symptoms, or conditions."
-        defaultQuery="Diabet"
-      />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <Database className="h-5 w-5 mr-2 text-orange-500" />
-              Response Structure
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                <div className="bg-muted p-3 rounded text-sm">
-                  <code>
-                    {`{
-  "count": 6,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 13557,
-      "foundation_uri": "http://id.who.int/icd/entity/1907420475",
-      "code": "MG24.0",
-      "title": "Fear of cancer"
-    },
-    ...
-  ]
-}`}
-                  </code>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-orange-500" />
-              Field Descriptions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-sm mb-1">Response Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">count</span> - Total number of results</li>
-                  <li><span className="font-medium">next</span> - URL for next page of results</li>
-                  <li><span className="font-medium">previous</span> - URL for previous page of results</li>
-                  <li><span className="font-medium">results</span> - Array of terminology objects</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
-                <ul className="text-sm space-y-2">
-                  <li><span className="font-medium">id</span> - Unique identifier</li>
-                  <li><span className="font-medium">foundation_uri</span> - Foundation URI</li>
-                  <li><span className="font-medium">code</span> - ICD-11 code</li>
-                  <li><span className="font-medium">title</span> - Code title/description</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-// Mappings Page Component
-const MappingsPage = () => {
-  const [system, setSystem] = useState("ayurveda");
-  const [query, setQuery] = useState("fever");
-  const [minConfidence, setMinConfidence] = useState(0.1);
-  const [responseData, setResponseData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleSearch = async () => {
-    if (!query.trim()) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const url = `${API_BASE_URL}/terminologies/mappings/?system=${system}&q=${query}&min_confidence=${minConfidence}`;
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setResponseData(data);
-    } catch (err) {
-      setError(err.message);
-      console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="container px-6 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Mappings API</h2>
-        <p className="text-muted-foreground">
-          Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores.
-        </p>
-      </div>
-      
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Search Mappings</CardTitle>
-          <p className="text-muted-foreground">Find mappings between traditional medicine systems and ICD-11</p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">System</label>
-              <Select value={system} onValueChange={setSystem}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select system" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ayurveda">Ayurveda</SelectItem>
-                  <SelectItem value="siddha">Siddha</SelectItem>
-                  <SelectItem value="unani">Unani</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Search Query</label>
-              <Input
-                placeholder="Enter search term..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Min Confidence</label>
-              <Input
-                type="number"
-                step="0.1"
-                min="0.1"
-                max="1.0"
-                value={minConfidence}
-                onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
-              />
-            </div>
-          </div>
-          
-          <Button onClick={handleSearch} disabled={loading}>
-            {loading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-            ) : (
-              <Search className="h-4 w-4 mr-2" />
-            )}
-            Search Mappings
-          </Button>
-        </CardContent>
-      </Card>
-      
-      <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-      
-      {responseData && (
-        <div className="mt-8">
-          <h3 className="text-xl font-bold mb-4">Mapping Results</h3>
-          
-          {responseData.results && responseData.results.length > 0 ? (
-            <div className="space-y-4">
-              {responseData.results.map((mapping, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{mapping.source_term.english_name}</CardTitle>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline">{mapping.source_term.code}</Badge>
-                      <Badge variant="secondary">Confidence: {(mapping.confidence_score * 100).toFixed(1)}%</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Source Term</h4>
-                        <div className="bg-muted p-3 rounded text-sm">
-                          <p><span className="font-medium">Code:</span> {mapping.source_term.code}</p>
-                          <p><span className="font-medium">Name:</span> {mapping.source_term.english_name}</p>
-                          {mapping.source_term.hindi_name && (
-                            <p><span className="font-medium">Hindi:</span> {mapping.source_term.hindi_name}</p>
-                          )}
-                          {mapping.source_term.diacritical_name && (
-                            <p><span className="font-medium">Diacritical:</span> {mapping.source_term.diacritical_name}</p>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2">ICD-11 Mapping</h4>
-                        {mapping.icd_mapping ? (
-                          <div className="bg-muted p-3 rounded text-sm">
-                            <p><span className="font-medium">Code:</span> {mapping.icd_mapping.code}</p>
-                            <p><span className="font-medium">Title:</span> {mapping.icd_mapping.title}</p>
-                            <p><span className="font-medium">Similarity:</span> {(mapping.icd_mapping.similarity_score * 100).toFixed(1)}%</p>
-                          </div>
-                        ) : (
-                          <div className="bg-muted p-3 rounded text-sm">
-                            <p className="text-muted-foreground">No ICD-11 mapping available</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : responseData.fuzzy_matches_without_mappings && responseData.fuzzy_matches_without_mappings.length > 0 ? (
-            <div>
-              <h4 className="font-medium mb-3">Fuzzy Matches (No Mappings)</h4>
-              <div className="space-y-3">
-                {responseData.fuzzy_matches_without_mappings.map((match, index) => (
-                  <Card key={index}>
-                    <CardContent className="pt-6">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{match.english_name}</p>
-                          <p className="text-sm text-muted-foreground">Code: {match.code}</p>
-                          <p className="text-sm">Similarity: {(match.similarity * 100).toFixed(1)}%</p>
-                        </div>
-                        <Badge variant="outline">{match.message}</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-muted rounded-lg p-8 text-center">
-              <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No mappings found</h3>
-              <p className="text-muted-foreground">Try a different search term or adjust the confidence threshold.</p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Testing Playground Component
-const TestingPlayground = () => {
-  const [selectedEndpoint, setSelectedEndpoint] = useState("ayurveda");
-  const [query, setQuery] = useState("");
-  const [responseData, setResponseData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const endpoints = {
-    ayurveda: `${API_BASE_URL}/terminologies/ayurveda/search/?q=`,
-    siddha: `${API_BASE_URL}/terminologies/siddha/search/?q=`,
-    unani: `${API_BASE_URL}/terminologies/unani/search/?q=`,
-    icd11: `${API_BASE_URL}/terminologies/icd11/search/?q=`,
-    mappings: `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=`
-  };
-
-  const handleTest = async () => {
-    if (!query.trim() && selectedEndpoint !== "mappings") return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      let url = endpoints[selectedEndpoint];
-      
-      if (selectedEndpoint === "mappings") {
-        url = `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${query || "fever"}&min_confidence=0.1`;
-      } else {
-        url += query;
-      }
-      
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setResponseData(data);
-    } catch (err) {
-      setError(err.message);
-      console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="container px-6 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">API Testing Playground</h2>
-        <p className="text-muted-foreground">
-          Test all API endpoints in one place. Select an endpoint, enter parameters, and see the response.
-        </p>
-      </div>
-      
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Test Endpoints</CardTitle>
-          <p className="text-muted-foreground">Select an endpoint and enter parameters to test</p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Select Endpoint</label>
-              <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select endpoint" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
-                  <SelectItem value="siddha">Siddha Search</SelectItem>
-                  <SelectItem value="unani">Unani Search</SelectItem>
-                  <SelectItem value="icd11">ICD-11 Search</SelectItem>
-                  <SelectItem value="mappings">Mappings</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                {selectedEndpoint === "mappings" ? "Search Query (optional)" : "Search Query"}
-              </label>
-              <Input
-                placeholder={
-                  selectedEndpoint === "mappings" 
-                    ? "Enter search term (default: fever)" 
-                    : "Enter search term"
-                }
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleTest()}
-              />
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Button onClick={handleTest} disabled={loading}>
-              {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              ) : (
-                <Code className="h-4 w-4 mr-2" />
-              )}
-              Test Endpoint
-            </Button>
-            
-            <div className="text-sm text-muted-foreground">
-              Endpoint: <code className="bg-muted px-2 py-1 rounded">{endpoints[selectedEndpoint]}</code>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-    </div>
-  );
-};
-
 // Analytics Page Component
 const AnalyticsPage = () => {
   // Mock data for charts
@@ -2210,7 +1974,7 @@ const AnalyticsPage = () => {
   ];
 
   return (
-    <div className="container px-6 py-8 max-w-4xl">
+    <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-4">API Analytics</h2>
         <p className="text-muted-foreground">
@@ -2299,7 +2063,7 @@ const HomePage = () => {
     <div>
       <HeroSection />
       
-      <div className="container px-6 py-12 max-w-4xl">
+      <div className="px-4 py-12 max-w-6xl mx-auto">
         <motion.section 
           className="mb-16"
           initial={{ opacity: 0, y: 20 }}
@@ -2383,7 +2147,7 @@ const HomePage = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Database className="h-5 w-5 mr-2 text-purple-500" />
-                  Siddha API
+                  Siddha API 
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -2443,18 +2207,18 @@ const HomePage = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Database className="h-5 w-5 mr-2 text-red-500" />
-                  Mappings API
+                  Mappings & Testing API
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores.
+                  Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores, and test all API endpoints.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
                   <code>GET /terminologies/mappings/?system=system&q=query&min_confidence=0.1</code>
                 </div>
                 <Button asChild variant="outline">
-                  <Link to="/mappings">Explore Mappings API</Link>
+                  <Link to="/mappings-testing">Explore Mappings & Testing</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -2525,16 +2289,11 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/ayurveda" element={<AyurvedaPage />} />
-            <Route path="/about-ayurveda" element={<AboutAyurvedaPage />} />
             <Route path="/siddha" element={<SiddhaPage />} />
-            <Route path="/about-siddha" element={<AboutSiddhaPage />} />
             <Route path="/unani" element={<UnaniPage />} />
-            <Route path="/about-unani" element={<AboutUnaniPage />} />
             <Route path="/icd11" element={<ICD11Page />} />
-            <Route path="/about-icd11" element={<AboutICD11Page />} />
-            <Route path="/mappings" element={<MappingsPage />} />
+            <Route path="/mappings-testing" element={<MappingsTestingPage />} />
             <Route path="/all-endpoints" element={<AllEndpointsPage />} />
-            <Route path="/playground" element={<TestingPlayground />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
           </Routes>
         </div>
@@ -2556,4 +2315,4 @@ const ThemedApp = () => {
   );
 };
 
-export default ThemedApp;  
+export default ThemedApp;
