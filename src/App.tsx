@@ -773,17 +773,82 @@ const AIChatbot = () => {
 const HeroSection = () => {
   const [ref, inView] = useInView({
     threshold: 0.1,
-    triggerOnce: true
+    triggerOnce: true,
   });
+
+  const [counts, setCounts] = useState({
+    ayurveda: 4500,
+    siddha: 1200,
+    unani: 1800,
+    icd11: 529,
+  });
+
+  const [displayCounts, setDisplayCounts] = useState({
+    ayurveda: 1,
+    siddha: 1,
+    unani: 1,
+    icd11: 1,
+  });
+
+  // Function to animate counts
+  const animateCount = (key, target) => {
+    let current = 1;
+    const interval = setInterval(() => {
+      current += Math.ceil(target / 100);
+      if (current >= target) {
+        current = target;
+        clearInterval(interval);
+      }
+      setDisplayCounts((prev) => ({ ...prev, [key]: current }));
+    }, 20);
+  };
+
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const responses = await Promise.all([
+          fetch("http://localhost:8000/terminologies/ayurveda/search/?q=diseane"),
+          fetch("http://localhost:8000/terminologies/siddha/search/?q=diseane"),
+          fetch("http://localhost:8000/terminologies/unani/search/?q=diseane"),
+          fetch(
+            "http://localhost:8000/terminologies/icd11/search/?q=Diabet&fuzzy=true&threshold=0.3"
+          ),
+        ]);
+
+        const data = await Promise.all(responses.map((res) => res.json()));
+
+        const newCounts = {
+          ayurveda: data[0]?.length || 4500,
+          siddha: data[1]?.length || 1200,
+          unani: data[2]?.length || 1800,
+          icd11: data[3]?.length || 529,
+        };
+
+        setCounts(newCounts);
+
+        Object.keys(newCounts).forEach((key) => {
+          animateCount(key, newCounts[key]);
+        });
+      } catch (error) {
+        console.error("Error fetching counts, using fallback:", error);
+
+        Object.keys(counts).forEach((key) => {
+          animateCount(key, counts[key]);
+        });
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   return (
     <section className="relative py-20 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/50 to-background"></div>
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMorgLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMjkuNSIgY3k9IjI5LjUiIHI9IjEuNSIvPjwvZz48L2c+PC9zdmc+')] opacity-50"></div>
-      
+
       <div className="container relative z-10 px-4">
         <div className="max-w-4xl mx-auto text-center">
-            
           <motion.div
             ref={ref}
             initial={{ opacity: 0, y: 20 }}
@@ -791,12 +856,11 @@ const HeroSection = () => {
             transition={{ duration: 0.8 }}
             className="flex justify-center mb-6"
           >
-        
             <Badge className="bg-blue-500/10 text-white-500 border-blue-500/20 px-4 py-1">
               FHIR R4 Compliant • ICD-11 TM2 • India EHR Standards 2016
             </Badge>
           </motion.div>
-          
+
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -805,33 +869,34 @@ const HeroSection = () => {
           >
             NAMASTE & ICD-11 Integration API
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed"
           >
-            Comprehensive documentation for India's traditional medicine terminologies integrated with WHO ICD-11 TM2. Explore endpoints, test APIs, and understand responses.
+            Comprehensive documentation for India's traditional medicine
+            terminologies integrated with WHO ICD-11 TM2. Explore endpoints,
+            test APIs, and understand responses.
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex items-center justify-center gap-4 mb-12 flex-wrap"
           >
-            
             <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
               Get Started
             </Button>
- <a href="http://localhost:8080/all-endpoints">
-      <Button variant="outline" size="lg">
-        View API Reference
-      </Button>
-    </a>
+            <a href="http://localhost:8080/all-endpoints">
+              <Button variant="outline" size="lg">
+                View API Reference
+              </Button>
+            </a>
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -841,20 +906,36 @@ const HeroSection = () => {
               <CardContent className="p-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                   <div>
-                    <div className="text-2xl font-bold mb-2">4,500+</div>
-                    <div className="text-sm text-muted-foreground">Ayurveda Terms</div>
+                    <div className="text-2xl font-bold mb-2">
+                      {displayCounts.ayurveda}+
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Ayurveda Terms
+                    </div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold mb-2">1,200+</div>
-                    <div className="text-sm text-muted-foreground">Siddha Terms</div>
+                    <div className="text-2xl font-bold mb-2">
+                      {displayCounts.siddha}+
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Siddha Terms
+                    </div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold mb-2">1,800+</div>
-                    <div className="text-sm text-muted-foreground">Unani Terms</div>
+                    <div className="text-2xl font-bold mb-2">
+                      {displayCounts.unani}+
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Unani Terms
+                    </div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold mb-2">529</div>
-                    <div className="text-sm text-muted-foreground">ICD-11 TM2 Codes</div>
+                    <div className="text-2xl font-bold mb-2">
+                      {displayCounts.icd11}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      ICD-11 TM2 Codes
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -865,6 +946,7 @@ const HeroSection = () => {
     </section>
   );
 };
+
 
 // Copy to clipboard function
 const copyToClipboard = (text) => {
@@ -2118,69 +2200,89 @@ const MappingsTestingPage = () => {
           </Card>
         </div>
         
-        <div>
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Test Endpoints</CardTitle>
-              <p className="text-muted-foreground">Select an endpoint and enter parameters to test</p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Select Endpoint</label>
-                  <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select endpoint" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
-                      <SelectItem value="siddha">Siddha Search</SelectItem>
-                      <SelectItem value="unani">Unani Search</SelectItem>
-                      <SelectItem value="icd11">ICD-11 Search</SelectItem>
-                      <SelectItem value="mappings">Mappings</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {selectedEndpoint === "mappings" ? "Search Query (optional)" : "Search Query"}
-                  </label>
-                  <Input
-                    placeholder={
-                      selectedEndpoint === "mappings" 
-                        ? "Enter search term (default: fever)" 
-                        : "Enter search term"
-                    }
-                    value={testQuery}
-                    onChange={(e) => setTestQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleTest()}
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <Button onClick={handleTest} disabled={loading}>
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Code className="h-4 w-4 mr-2" />
-                  )}
-                  Test Endpoint
-                </Button>
-                
-                <div className="text-sm text-muted-foreground">
-                  Endpoint: <code className="bg-muted px-2 py-1 rounded">
-                    {selectedEndpoint === "mappings" 
-                      ? `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${testQuery || "fever"}&min_confidence=0.1`
-                      : `${API_BASE_URL}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
-                    }
-                  </code>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+       <div>
+  <Card className="mb-8 w-[calc(100%+20px)]"> 
+    <CardHeader>
+      <CardTitle>Test Endpoints</CardTitle>
+      <p className="text-muted-foreground">
+        Select an endpoint and enter parameters to test
+      </p>
+    </CardHeader>
+    <CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Select Endpoint</label>
+          <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select endpoint" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
+              <SelectItem value="siddha">Siddha Search</SelectItem>
+              <SelectItem value="unani">Unani Search</SelectItem>
+              <SelectItem value="icd11">ICD-11 Search</SelectItem>
+              <SelectItem value="mappings">Mappings</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            {selectedEndpoint === "mappings"
+              ? "Search Query (optional)"
+              : "Search Query"}
+          </label>
+          <Input
+            placeholder={
+              selectedEndpoint === "mappings"
+                ? "Enter search term (default: fever)"
+                : "Enter search term"
+            }
+            value={testQuery}
+            onChange={(e) => setTestQuery(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleTest()}
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <Button onClick={handleTest} disabled={loading}>
+          {loading ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+          ) : (
+            <Code className="h-4 w-4 mr-2" />
+          )}
+          Test Endpoint
+        </Button>
+
+        {/* Click to copy endpoint */}
+        <div
+          className="text-sm text-muted-foreground cursor-pointer"
+          onClick={() =>
+            navigator.clipboard.writeText(
+              selectedEndpoint === "mappings"
+                ? `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${
+                    testQuery || "fever"
+                  }&min_confidence=0.1`
+                : `${API_BASE_URL}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
+            )
+          }
+          title="Click to copy"
+        >
+          Endpoint:{" "}
+          <code className="bg-muted px-2 py-1 rounded">
+            {selectedEndpoint === "mappings"
+              ? `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${
+                  testQuery || "fever"
+                }&min_confidence=0.1`
+              : `${API_BASE_URL}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
+          </code>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</div>
+
       </div>
       
       <ApiResponseDisplay data={responseData} loading={loading} error={error} />
