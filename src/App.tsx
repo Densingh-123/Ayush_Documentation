@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext,useRef } from "react";
+import React, { useState, useEffect, createContext, useContext, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -56,7 +56,9 @@ import {
   X,
   Send,
   Bot,
-  User
+  User,
+  Upload,
+  Zap
 } from "lucide-react";
 
 // Theme Context
@@ -177,6 +179,16 @@ const Sidebar = () => {
       title: "Mappings & Testing",
       href: "/mappings-testing",
       icon: <Code className="h-4 w-4" />
+    },
+    {
+      title: "Upload CSV",
+      href: "/upload",
+      icon: <Upload className="h-4 w-4" />
+    },
+    {
+      title: "Autocomplete",
+      href: "/autocomplete",
+      icon: <Zap className="h-4 w-4" />
     },
     {
       title: "All Endpoints",
@@ -756,6 +768,7 @@ const AIChatbot = () => {
     </Card>
   );
 };
+
 // Hero Section Component
 const HeroSection = () => {
   const [ref, inView] = useInView({
@@ -853,6 +866,16 @@ const HeroSection = () => {
   );
 };
 
+// Copy to clipboard function
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text).then(() => {
+    // You can add a toast notification here if needed
+    console.log('Text copied to clipboard');
+  }).catch(err => {
+    console.error('Failed to copy text: ', err);
+  });
+};
+
 // API Response Display Component
 const ApiResponseDisplay = ({ data, loading, error }) => {
   if (loading) {
@@ -888,6 +911,17 @@ const ApiResponseDisplay = ({ data, loading, error }) => {
 
   return (
     <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-white text-sm font-medium">Response</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => copyToClipboard(JSON.stringify(data, null, 2))}
+          className="h-8 w-8 p-0 text-white hover:bg-white/10"
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
+      </div>
       <pre className="text-sm text-white overflow-auto">
         <code>{JSON.stringify(data, null, 2)}</code>
       </pre>
@@ -962,7 +996,12 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
                 <code className="bg-muted-foreground/10 px-2 py-1 rounded">
                   {endpoint}{query}
                 </code>
-                <Button variant="ghost" size="sm" className="ml-2 h-8 w-8 p-0">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="ml-2 h-8 w-8 p-0"
+                  onClick={() => copyToClipboard(`${endpoint}${query}`)}
+                >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -975,6 +1014,417 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
         )}
       </CardContent>
     </Card>
+  );
+};
+
+// Upload Page Component
+const UploadPage = () => {
+  const [selectedSystem, setSelectedSystem] = useState("ayurveda");
+  const [file, setFile] = useState(null);
+  const [updateSearchVector, setUpdateSearchVector] = useState(true);
+  const [responseData, setResponseData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setError("Please select a file to upload");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('update_search_vector', updateSearchVector.toString());
+
+      const url = `${API_BASE_URL}/terminologies/${selectedSystem}/csv/upload/`;
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error uploading file:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const systemInfo = {
+    ayurveda: {
+      columns: "code, english_name, description, hindi_name, diacritical_name",
+      description: "Upload CSV file to populate Ayurveda terms database. Updates existing records by code or creates new ones."
+    },
+    siddha: {
+      columns: "code, english_name, description, tamil_name, romanized_name, reference",
+      description: "Upload CSV file to populate Siddha terms database. Updates existing records by code or creates new ones."
+    },
+    unani: {
+      columns: "code, english_name, description, arabic_name, romanized_name, reference",
+      description: "Upload CSV file to populate Unani terms database. Updates existing records by code or creates new ones."
+    }
+  };
+
+  return (
+    <div className="px-4 py-8 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold mb-4">CSV Upload API</h2>
+        <p className="text-muted-foreground">
+          Upload CSV files to populate traditional medicine terminology databases. Updates existing records by code or creates new ones.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Upload CSV File</CardTitle>
+              <p className="text-muted-foreground">{systemInfo[selectedSystem].description}</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select System</label>
+                  <Select value={selectedSystem} onValueChange={setSelectedSystem}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select system" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ayurveda">Ayurveda</SelectItem>
+                      <SelectItem value="siddha">Siddha</SelectItem>
+                      <SelectItem value="unani">Unani</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">CSV File</label>
+                  <Input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Required columns: {systemInfo[selectedSystem].columns}
+                  </p>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="updateSearchVector"
+                    checked={updateSearchVector}
+                    onChange={(e) => setUpdateSearchVector(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  <label htmlFor="updateSearchVector" className="text-sm font-medium">
+                    Update search vectors after import
+                  </label>
+                </div>
+                
+                <Button onClick={handleUpload} disabled={loading} className="w-full">
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  ) : (
+                    <Upload className="h-4 w-4 mr-2" />
+                  )}
+                  Upload CSV
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                Endpoint Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Method</h4>
+                  <Badge variant="outline" className="mb-2">POST</Badge>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">URL</h4>
+                  <div className="bg-muted p-2 rounded text-sm">
+                    <code>{`${API_BASE_URL}/terminologies/{system}/csv/upload/`}</code>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Parameters</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">file</span> - CSV file with required columns</li>
+                    <li><span className="font-medium">update_search_vector</span> - Whether to update search vectors after import (default: true)</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Responses</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">200</span> - CSV processed successfully</li>
+                    <li><span className="font-medium">400</span> - Bad request - invalid file or format</li>
+                    <li><span className="font-medium">413</span> - File too large</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div>
+          <ApiResponseDisplay data={responseData} loading={loading} error={error} />
+          
+          {responseData && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Upload Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{responseData.created || 0}</div>
+                    <div className="text-sm text-green-800">Created</div>
+                  </div>
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{responseData.updated || 0}</div>
+                    <div className="text-sm text-blue-800">Updated</div>
+                  </div>
+                  <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                    <div className="text-2xl font-bold text-yellow-600">{responseData.skipped || 0}</div>
+                    <div className="text-sm text-yellow-800">Skipped</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-gray-600">{responseData.total_processed || 0}</div>
+                    <div className="text-sm text-gray-800">Total Processed</div>
+                  </div>
+                </div>
+                
+                {responseData.errors && responseData.errors.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="font-medium mb-2">Errors</h4>
+                    <div className="bg-red-50 p-3 rounded text-sm">
+                      <ul className="list-disc list-inside">
+                        {responseData.errors.map((error, index) => (
+                          <li key={index} className="text-red-700">{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Autocomplete Page Component
+const AutocompletePage = () => {
+  const [selectedSystem, setSelectedSystem] = useState("ayurveda");
+  const [query, setQuery] = useState("");
+  const [limit, setLimit] = useState(10);
+  const [responseData, setResponseData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const systemInfo = {
+    ayurveda: {
+      description: "Fast autocomplete for Ayurveda terms - returns only English name titles for optimal performance",
+      searchFields: "English, Hindi, and diacritical names"
+    },
+    siddha: {
+      description: "Fast autocomplete for Siddha terms - returns only English name titles for optimal performance",
+      searchFields: "English, Tamil, and romanized names"
+    },
+    unani: {
+      description: "Fast autocomplete for Unani terms - returns only English name titles for optimal performance",
+      searchFields: "English, Arabic, and romanized names"
+    },
+    icd11: {
+      description: "Fast autocomplete for ICD-11 terms - returns only matching titles for optimal performance",
+      searchFields: "Title, code, and definition"
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const url = `${API_BASE_URL}/terminologies/${selectedSystem}/autocomplete/?q=${encodeURIComponent(query)}&limit=${limit}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="px-4 py-8 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold mb-4">Autocomplete API</h2>
+        <p className="text-muted-foreground">
+          Fast autocomplete endpoints for traditional medicine terminologies - returns only matching titles for optimal performance.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Autocomplete Search</CardTitle>
+              <p className="text-muted-foreground">{systemInfo[selectedSystem].description}</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select System</label>
+                  <Select value={selectedSystem} onValueChange={setSelectedSystem}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select system" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ayurveda">Ayurveda</SelectItem>
+                      <SelectItem value="siddha">Siddha</SelectItem>
+                      <SelectItem value="unani">Unani</SelectItem>
+                      <SelectItem value="icd11">ICD-11</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Search Term</label>
+                  <Input
+                    placeholder="Enter search term..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Searches across: {systemInfo[selectedSystem].searchFields}
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Limit</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={limit}
+                    onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Maximum results to return (default: 10, max: 20)
+                  </p>
+                </div>
+                
+                <Button onClick={handleSearch} disabled={loading} className="w-full">
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  ) : (
+                    <Zap className="h-4 w-4 mr-2" />
+                  )}
+                  Autocomplete Search
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                Endpoint Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Method</h4>
+                  <Badge variant="outline" className="mb-2">GET</Badge>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">URL</h4>
+                  <div className="bg-muted p-2 rounded text-sm">
+                    <code>{`${API_BASE_URL}/terminologies/{system}/autocomplete/`}</code>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Parameters</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">q</span> - Search term for autocomplete</li>
+                    <li><span className="font-medium">limit</span> - Maximum results to return (default: 10, max: 20)</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Response</h4>
+                  <p className="text-sm">Array of matching title names only</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div>
+          <ApiResponseDisplay data={responseData} loading={loading} error={error} />
+          
+          {responseData && Array.isArray(responseData) && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Autocomplete Results</CardTitle>
+                <p className="text-muted-foreground">Found {responseData.length} matching terms</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {responseData.map((term, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <span className="font-medium">{term}</span>
+                      <Badge variant="outline">#{index + 1}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -1903,6 +2353,92 @@ const AllEndpointsPage = () => {
         ],
         results: []
       }
+    },
+    {
+      name: "Ayurveda Autocomplete",
+      method: "GET",
+      endpoint: `${API_BASE_URL}/terminologies/ayurveda/autocomplete/?q=query&limit=10`,
+      description: "Fast autocomplete for Ayurveda terms - returns only English name titles",
+      sample: [
+        "fever",
+        "fever with headache",
+        "febrile condition"
+      ]
+    },
+    {
+      name: "Siddha Autocomplete",
+      method: "GET",
+      endpoint: `${API_BASE_URL}/terminologies/siddha/autocomplete/?q=query&limit=10`,
+      description: "Fast autocomplete for Siddha terms - returns only English name titles",
+      sample: [
+        "fever",
+        "fever with headache",
+        "febrile condition"
+      ]
+    },
+    {
+      name: "Unani Autocomplete",
+      method: "GET",
+      endpoint: `${API_BASE_URL}/terminologies/unani/autocomplete/?q=query&limit=10`,
+      description: "Fast autocomplete for Unani terms - returns only English name titles",
+      sample: [
+        "fever",
+        "fever with headache",
+        "febrile condition"
+      ]
+    },
+    {
+      name: "ICD-11 Autocomplete",
+      method: "GET",
+      endpoint: `${API_BASE_URL}/terminologies/icd11/autocomplete/?q=query&limit=10`,
+      description: "Fast autocomplete for ICD-11 terms - returns only matching titles",
+      sample: [
+        "diabetes mellitus",
+        "diabetes type 1",
+        "diabetic nephropathy"
+      ]
+    },
+    {
+      name: "Ayurveda CSV Upload",
+      method: "POST",
+      endpoint: `${API_BASE_URL}/terminologies/ayurveda/csv/upload/`,
+      description: "Upload CSV file to populate Ayurveda terms database",
+      sample: {
+        created: 5,
+        updated: 3,
+        skipped: 2,
+        total_processed: 10,
+        errors: [],
+        summary: "CSV processed successfully"
+      }
+    },
+    {
+      name: "Siddha CSV Upload",
+      method: "POST",
+      endpoint: `${API_BASE_URL}/terminologies/siddha/csv/upload/`,
+      description: "Upload CSV file to populate Siddha terms database",
+      sample: {
+        created: 5,
+        updated: 3,
+        skipped: 2,
+        total_processed: 10,
+        errors: [],
+        summary: "CSV processed successfully"
+      }
+    },
+    {
+      name: "Unani CSV Upload",
+      method: "POST",
+      endpoint: `${API_BASE_URL}/terminologies/unani/csv/upload/`,
+      description: "Upload CSV file to populate Unani terms database",
+      sample: {
+        created: 5,
+        updated: 3,
+        skipped: 2,
+        total_processed: 10,
+        errors: [],
+        summary: "CSV processed successfully"
+      }
     }
   ];
 
@@ -1929,11 +2465,32 @@ const AllEndpointsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="bg-muted p-4 rounded-lg mb-6">
-                <code className="text-sm break-all">{endpoint.endpoint}</code>
+                <div className="flex justify-between items-center">
+                  <code className="text-sm break-all">{endpoint.endpoint}</code>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => copyToClipboard(endpoint.endpoint)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               
               <h4 className="font-medium mb-3">Sample Response</h4>
               <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-white text-sm font-medium">Response</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(JSON.stringify(endpoint.sample, null, 2))}
+                    className="h-8 w-8 p-0 text-white hover:bg-white/10"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
                 <pre className="text-sm text-white">
                   <code>{JSON.stringify(endpoint.sample, null, 2)}</code>
                 </pre>
@@ -2206,19 +2763,39 @@ const HomePage = () => {
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Database className="h-5 w-5 mr-2 text-red-500" />
-                  Mappings & Testing API
+                  <Upload className="h-5 w-5 mr-2 text-red-500" />
+                  Upload CSV API
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores, and test all API endpoints.
+                  Upload CSV files to populate traditional medicine terminology databases. Updates existing records by code or creates new ones.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>GET /terminologies/mappings/?system=system&q=query&min_confidence=0.1</code>
+                  <code>POST /terminologies/{`{system}`}/csv/upload/</code>
                 </div>
                 <Button asChild variant="outline">
-                  <Link to="/mappings-testing">Explore Mappings & Testing</Link>
+                  <Link to="/upload">Explore Upload API</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Zap className="h-5 w-5 mr-2 text-yellow-500" />
+                  Autocomplete API
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Fast autocomplete endpoints for traditional medicine terminologies - returns only matching titles for optimal performance.
+                </p>
+                <div className="bg-muted p-3 rounded text-sm mb-4">
+                  <code>GET /terminologies/{`{system}`}/autocomplete/?q=query</code>
+                </div>
+                <Button asChild variant="outline">
+                  <Link to="/autocomplete">Explore Autocomplete API</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -2293,6 +2870,8 @@ function App() {
             <Route path="/unani" element={<UnaniPage />} />
             <Route path="/icd11" element={<ICD11Page />} />
             <Route path="/mappings-testing" element={<MappingsTestingPage />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/autocomplete" element={<AutocompletePage />} />
             <Route path="/all-endpoints" element={<AllEndpointsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
           </Routes>
