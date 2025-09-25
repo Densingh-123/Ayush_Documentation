@@ -58,7 +58,8 @@ import {
   Bot,
   User,
   Upload,
-  Zap
+  Zap,
+  Menu
 } from "lucide-react";
 
 // Theme Context
@@ -72,6 +73,7 @@ const useThemeContext = () => useContext(ThemeContext);
 
 // API base URL
 const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL_DISPLAY = "{{base_url}}";
 
 // Animation variants
 const fadeIn = {
@@ -88,10 +90,127 @@ const scaleIn = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
 };
 
+// Mobile Sidebar Component
+const MobileSidebar = ({ isOpen, onClose }) => {
+  const [activeItem, setActiveItem] = useState("");
+
+  const sidebarItems = [
+    {
+      title: "Introduction",
+      href: "/",
+      icon: <FileText className="h-4 w-4" />
+    },
+    {
+      title: "Ayurveda API",
+      href: "/ayurveda",
+      icon: <Database className="h-4 w-4" />
+    },
+    {
+      title: "Siddha API",
+      href: "/siddha",
+      icon: <Database className="h-4 w-4" />
+    },
+    {
+      title: "Unani API",
+      href: "/unani",
+      icon: <Database className="h-4 w-4" />
+    },
+    {
+      title: "ICD-11 API",
+      href: "/icd11",
+      icon: <Database className="h-4 w-4" />
+    },
+    {
+      title: "Mappings & Testing",
+      href: "/mappings-testing",
+      icon: <Code className="h-4 w-4" />
+    },
+    {
+      title: "Upload CSV",
+      href: "/upload",
+      icon: <Upload className="h-4 w-4" />
+    },
+    {
+      title: "Autocomplete",
+      href: "/autocomplete",
+      icon: <Zap className="h-4 w-4" />
+    },
+    {
+      title: "All Endpoints",
+      href: "/all-endpoints",
+      icon: <Database className="h-4 w-4" />
+    },
+    {
+      title: "Analytics",
+      href: "/analytics",
+      icon: <BarChart3 className="h-4 w-4" />
+    }
+  ];
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={onClose}
+          />
+          
+          {/* Sidebar */}
+          <motion.aside
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: "tween", duration: 0.3 }}
+            className="fixed inset-y-0 left-0 z-50 w-64 border-r bg-card backdrop-blur mt-16 md:hidden"
+          >
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Navigation</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <ScrollArea className="h-full p-4">
+              <div className="space-y-2">
+                {sidebarItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted ${activeItem === item.href ? "bg-muted" : ""}`}
+                    onClick={() => {
+                      setActiveItem(item.href);
+                      onClose();
+                    }}
+                  >
+                    {item.icon}
+                    {item.title}
+                    <ChevronRight className="h-4 w-4 ml-auto" />
+                  </Link>
+                ))}
+              </div>
+            </ScrollArea>
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
 // Header Component
 const Header = () => {
   const { theme, setTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -102,45 +221,62 @@ const Header = () => {
   }, []);
 
   return (
-<header
-  className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all ${
-    isScrolled ? "shadow-md" : ""
-  }`}
->
-  <div className="flex h-20 items-center justify-between px-4">
-  {/* Left Section: Logo + Title */}
-  <div className="flex items-center gap-4">
-    <Link to="/" className="flex items-center gap-2">
-      <img
-        src="/logo.png"
-        alt="Logo"
-        className="h-14 w-14 object-contain"
-      />
-      <h1 className="text-2xl font-bold italic text-[#1e88e5]">
-        Ayush Bandhan API Documentation
-      </h1>
-    </Link>
-  </div>
-
-    {/* Right Section: Theme Toggle */}
-    <nav className="flex items-center gap-4">
-      <Badge variant="secondary" className="hidden sm:flex">
-        v1.0.0
-      </Badge>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="h-9 w-9 px-0"
+    <>
+      <header
+        className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all ${
+          isScrolled ? "shadow-md" : ""
+        }`}
       >
-        <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-        <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-        <span className="sr-only">Toggle theme</span>
-      </Button>
-    </nav>
-  </div>
-</header>
+        <div className="flex h-20 items-center justify-between px-4">
+          {/* Left Section: Logo + Title + Mobile Menu Button */}
+          <div className="flex items-center gap-4">
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="h-9 w-9 px-0 md:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
 
+            <Link to="/" className="flex items-center gap-2">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-14 w-14 object-contain"
+              />
+              <h1 className="text-xl md:text-2xl font-bold italic text-[#1e88e5]">
+                Ayush Bandhan API Documentation
+              </h1>
+            </Link>
+          </div>
+
+          {/* Right Section: Theme Toggle */}
+          <nav className="flex items-center gap-4">
+            <Badge variant="secondary" className="hidden sm:flex">
+              v1.0.0
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-9 w-9 px-0"
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </nav>
+        </div>
+      </header>
+
+      {/* Mobile Sidebar */}
+      <MobileSidebar 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+      />
+    </>
   );
 };
 
@@ -890,11 +1026,11 @@ const HeroSection = () => {
             <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
               Get Started
             </Button>
-            <a href="http://localhost:8080/all-endpoints">
+            <Link to="/all-endpoints">
               <Button variant="outline" size="lg">
                 View API Reference
               </Button>
-            </a>
+            </Link>
           </motion.div>
 
           <motion.div
@@ -1025,7 +1161,7 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
     setError(null);
     
     try {
-      const url = `${endpoint}${query}`;
+      const url = `${API_BASE_URL}${endpoint}${query}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -1076,13 +1212,13 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
               <div className="flex items-center mb-2">
                 <span className="font-medium mr-2">URL:</span>
                 <code className="bg-muted-foreground/10 px-2 py-1 rounded">
-                  {endpoint}{query}
+                  {API_BASE_URL_DISPLAY}{endpoint}{query}
                 </code>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   className="ml-2 h-8 w-8 p-0"
-                  onClick={() => copyToClipboard(`${endpoint}${query}`)}
+                  onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}${endpoint}${query}`)}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -1247,7 +1383,7 @@ const UploadPage = () => {
                 <div>
                   <h4 className="font-medium text-sm mb-1">URL</h4>
                   <div className="bg-muted p-2 rounded text-sm">
-                    <code>{`${API_BASE_URL}/terminologies/{system}/csv/upload/`}</code>
+                    <code>{`${API_BASE_URL_DISPLAY}/terminologies/{system}/csv/upload/`}</code>
                   </div>
                 </div>
                 
@@ -1462,7 +1598,7 @@ const AutocompletePage = () => {
                 <div>
                   <h4 className="font-medium text-sm mb-1">URL</h4>
                   <div className="bg-muted p-2 rounded text-sm">
-                    <code>{`${API_BASE_URL}/terminologies/{system}/autocomplete/`}</code>
+                    <code>{`${API_BASE_URL_DISPLAY}/terminologies/{system}/autocomplete/`}</code>
                   </div>
                 </div>
                 
@@ -1524,7 +1660,7 @@ const AyurvedaPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
-            endpoint={`${API_BASE_URL}/terminologies/ayurveda/search/?q=`}
+            endpoint={`/terminologies/ayurveda/search/?q=`}
             title="Search Ayurveda Terms"
             description="Search Ayurveda terminologies by disease names, symptoms, or conditions."
           />
@@ -1544,7 +1680,7 @@ const AyurvedaPage = () => {
                     <code>
                       {`{
   "count": 283,
-  "next": "http://localhost:8000/terminologies/ayurveda/search/?page=2&q=diseane",
+  "next": "${API_BASE_URL_DISPLAY}/terminologies/ayurveda/search/?page=2&q=diseane",
   "previous": null,
   "results": [
     {
@@ -1662,7 +1798,7 @@ const SiddhaPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
-            endpoint={`${API_BASE_URL}/terminologies/siddha/search/?q=`}
+            endpoint={`/terminologies/siddha/search/?q=`}
             title="Search Siddha Terms"
             description="Search Siddha terminologies by disease names, symptoms, or conditions."
           />
@@ -1682,7 +1818,7 @@ const SiddhaPage = () => {
                     <code>
                       {`{
   "count": 138,
-  "next": "http://localhost:8000/terminologies/siddha/search/?page=2&q=diseane",
+  "next": "${API_BASE_URL_DISPLAY}/terminologies/siddha/search/?page=2&q=diseane",
   "previous": null,
   "results": [
     {
@@ -1800,7 +1936,7 @@ const UnaniPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
-            endpoint={`${API_BASE_URL}/terminologies/unani/search/?q=`}
+            endpoint={`/terminologies/unani/search/?q=`}
             title="Search Unani Terms"
             description="Search Unani terminologies by disease names, symptoms, or conditions."
           />
@@ -1820,7 +1956,7 @@ const UnaniPage = () => {
                     <code>
                       {`{
   "count": 139,
-  "next": "http://localhost:8000/terminologies/unani/search/?page=2&q=diseane",
+  "next": "${API_BASE_URL_DISPLAY}/terminologies/unani/search/?page=2&q=diseane",
   "previous": null,
   "results": [
     {
@@ -1938,7 +2074,7 @@ const ICD11Page = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
-            endpoint={`${API_BASE_URL}/terminologies/icd11/search/?q=`}
+            endpoint={`/terminologies/icd11/search/?q=`}
             title="Search ICD-11 Terms"
             description="Search ICD-11 terminologies by disease names, symptoms, or conditions."
             defaultQuery="Diabet"
@@ -2201,7 +2337,7 @@ const MappingsTestingPage = () => {
         </div>
         
        <div>
-  <Card className="mb-8 w-[calc(100%+20px)]"> 
+  <Card className="mb-8 w-full">
     <CardHeader>
       <CardTitle>Test Endpoints</CardTitle>
       <p className="text-muted-foreground">
@@ -2245,8 +2381,8 @@ const MappingsTestingPage = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <Button onClick={handleTest} disabled={loading}>
+      <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <Button onClick={handleTest} disabled={loading} className="md:w-auto w-full">
           {loading ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
           ) : (
@@ -2257,25 +2393,25 @@ const MappingsTestingPage = () => {
 
         {/* Click to copy endpoint */}
         <div
-          className="text-sm text-muted-foreground cursor-pointer"
+          className="text-sm text-muted-foreground cursor-pointer flex-1"
           onClick={() =>
             navigator.clipboard.writeText(
               selectedEndpoint === "mappings"
-                ? `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${
+                ? `${API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=${
                     testQuery || "fever"
                   }&min_confidence=0.1`
-                : `${API_BASE_URL}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
+                : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
             )
           }
           title="Click to copy"
         >
           Endpoint:{" "}
-          <code className="bg-muted px-2 py-1 rounded">
+          <code className="bg-muted px-2 py-1 rounded break-all">
             {selectedEndpoint === "mappings"
-              ? `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${
+              ? `${API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=${
                   testQuery || "fever"
                 }&min_confidence=0.1`
-              : `${API_BASE_URL}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
+              : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
           </code>
         </div>
       </div>
@@ -2348,11 +2484,11 @@ const AllEndpointsPage = () => {
     {
       name: "Ayurveda Search",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/ayurveda/search/?q=query`,
+      endpoint: `/terminologies/ayurveda/search/?q=query`,
       description: "Search Ayurveda medical terminologies",
       sample: {
         count: 283,
-        next: `${API_BASE_URL}/terminologies/ayurveda/search/?page=2&q=diseane`,
+        next: `${API_BASE_URL_DISPLAY}/terminologies/ayurveda/search/?page=2&q=diseane`,
         previous: null,
         results: [
           {
@@ -2368,11 +2504,11 @@ const AllEndpointsPage = () => {
     {
       name: "Siddha Search",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/siddha/search/?q=query`,
+      endpoint: `/terminologies/siddha/search/?q=query`,
       description: "Search Siddha medical terminologies",
       sample: {
         count: 138,
-        next: `${API_BASE_URL}/terminologies/siddha/search/?page=2&q=diseane`,
+        next: `${API_BASE_URL_DISPLAY}/terminologies/siddha/search/?page=2&q=diseane`,
         previous: null,
         results: [
           {
@@ -2388,11 +2524,11 @@ const AllEndpointsPage = () => {
     {
       name: "Unani Search",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/unani/search/?q=query`,
+      endpoint: `/terminologies/unani/search/?q=query`,
       description: "Search Unani medical terminologies",
       sample: {
         count: 139,
-        next: `${API_BASE_URL}/terminologies/unani/search/?page=2&q=diseane`,
+        next: `${API_BASE_URL_DISPLAY}/terminologies/unani/search/?page=2&q=diseane`,
         previous: null,
         results: [
           {
@@ -2408,7 +2544,7 @@ const AllEndpointsPage = () => {
     {
       name: "ICD-11 Search",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/icd11/search/?q=query`,
+      endpoint: `/terminologies/icd11/search/?q=query`,
       description: "Search ICD-11 medical codes",
       sample: {
         count: 6,
@@ -2427,7 +2563,7 @@ const AllEndpointsPage = () => {
     {
       name: "Mappings Search",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=query&min_confidence=0.1`,
+      endpoint: `/terminologies/mappings/?system=ayurveda&q=query&min_confidence=0.1`,
       description: "Find mappings between traditional medicine and ICD-11",
       sample: {
         search_params: {
@@ -2459,7 +2595,7 @@ const AllEndpointsPage = () => {
     {
       name: "Ayurveda Autocomplete",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/ayurveda/autocomplete/?q=query&limit=10`,
+      endpoint: `/terminologies/ayurveda/autocomplete/?q=query&limit=10`,
       description: "Fast autocomplete for Ayurveda terms - returns only English name titles",
       sample: [
         "fever",
@@ -2470,7 +2606,7 @@ const AllEndpointsPage = () => {
     {
       name: "Siddha Autocomplete",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/siddha/autocomplete/?q=query&limit=10`,
+      endpoint: `/terminologies/siddha/autocomplete/?q=query&limit=10`,
       description: "Fast autocomplete for Siddha terms - returns only English name titles",
       sample: [
         "fever",
@@ -2481,7 +2617,7 @@ const AllEndpointsPage = () => {
     {
       name: "Unani Autocomplete",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/unani/autocomplete/?q=query&limit=10`,
+      endpoint: `/terminologies/unani/autocomplete/?q=query&limit=10`,
       description: "Fast autocomplete for Unani terms - returns only English name titles",
       sample: [
         "fever",
@@ -2492,7 +2628,7 @@ const AllEndpointsPage = () => {
     {
       name: "ICD-11 Autocomplete",
       method: "GET",
-      endpoint: `${API_BASE_URL}/terminologies/icd11/autocomplete/?q=query&limit=10`,
+      endpoint: `/terminologies/icd11/autocomplete/?q=query&limit=10`,
       description: "Fast autocomplete for ICD-11 terms - returns only matching titles",
       sample: [
         "diabetes mellitus",
@@ -2503,7 +2639,7 @@ const AllEndpointsPage = () => {
     {
       name: "Ayurveda CSV Upload",
       method: "POST",
-      endpoint: `${API_BASE_URL}/terminologies/ayurveda/csv/upload/`,
+      endpoint: `/terminologies/ayurveda/csv/upload/`,
       description: "Upload CSV file to populate Ayurveda terms database",
       sample: {
         created: 5,
@@ -2517,7 +2653,7 @@ const AllEndpointsPage = () => {
     {
       name: "Siddha CSV Upload",
       method: "POST",
-      endpoint: `${API_BASE_URL}/terminologies/siddha/csv/upload/`,
+      endpoint: `/terminologies/siddha/csv/upload/`,
       description: "Upload CSV file to populate Siddha terms database",
       sample: {
         created: 5,
@@ -2531,7 +2667,7 @@ const AllEndpointsPage = () => {
     {
       name: "Unani CSV Upload",
       method: "POST",
-      endpoint: `${API_BASE_URL}/terminologies/unani/csv/upload/`,
+      endpoint: `/terminologies/unani/csv/upload/`,
       description: "Upload CSV file to populate Unani terms database",
       sample: {
         created: 5,
@@ -2568,11 +2704,11 @@ const AllEndpointsPage = () => {
             <CardContent>
               <div className="bg-muted p-4 rounded-lg mb-6">
                 <div className="flex justify-between items-center">
-                  <code className="text-sm break-all">{endpoint.endpoint}</code>
+                  <code className="text-sm break-all">{API_BASE_URL_DISPLAY}{endpoint.endpoint}</code>
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => copyToClipboard(endpoint.endpoint)}
+                    onClick={() => copyToClipboard(API_BASE_URL_DISPLAY + endpoint.endpoint)}
                     className="h-8 w-8 p-0"
                   >
                     <Copy className="h-4 w-4" />
@@ -2794,7 +2930,7 @@ const HomePage = () => {
                   Search Ayurveda medical terminologies with English names, Hindi names, and diacritical representations.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>GET /terminologies/ayurveda/search/?q=query</code>
+                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/ayurveda/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
                   <Link to="/ayurveda">Explore Ayurveda API</Link>
@@ -2814,7 +2950,7 @@ const HomePage = () => {
                   Search Siddha medical terminologies with English names, Tamil names, and romanized representations.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>GET /terminologies/siddha/search/?q=query</code>
+                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/siddha/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
                   <Link to="/siddha">Explore Siddha API</Link>
@@ -2834,7 +2970,7 @@ const HomePage = () => {
                   Search Unani medical terminologies with English names, Arabic names, and romanized representations.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>GET /terminologies/unani/search/?q=query</code>
+                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/unani/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
                   <Link to="/unani">Explore Unani API</Link>
@@ -2854,7 +2990,7 @@ const HomePage = () => {
                   Search ICD-11 medical codes and terminologies with detailed information.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>GET /terminologies/icd11/search/?q=query</code>
+                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/icd11/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
                   <Link to="/icd11">Explore ICD-11 API</Link>
@@ -2874,7 +3010,7 @@ const HomePage = () => {
                   Upload CSV files to populate traditional medicine terminology databases. Updates existing records by code or creates new ones.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>POST /terminologies/{`{system}`}/csv/upload/</code>
+                  <code>POST {API_BASE_URL_DISPLAY}/terminologies/{`{system}`}/csv/upload/</code>
                 </div>
                 <Button asChild variant="outline">
                   <Link to="/upload">Explore Upload API</Link>
@@ -2894,7 +3030,7 @@ const HomePage = () => {
                   Fast autocomplete endpoints for traditional medicine terminologies - returns only matching titles for optimal performance.
                 </p>
                 <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>GET /terminologies/{`{system}`}/autocomplete/?q=query</code>
+                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/{`{system}`}/autocomplete/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
                   <Link to="/autocomplete">Explore Autocomplete API</Link>
