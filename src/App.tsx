@@ -247,7 +247,7 @@ const Header = () => {
                 className="h-14 w-14 object-contain"
               />
               <h1 className="text-xl md:text-2xl font-bold italic text-[#1e88e5]">
-                Ayush Bandhan API Documentation
+                Ayush Bhandhan API Documentation
               </h1>
             </Link>
           </div>
