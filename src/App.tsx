@@ -122,12 +122,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       icon: <Database className="h-4 w-4" />
     },
     {
-      title: "Mappings & Testing",
+      title: "Cocept Mapping",
       href: "/mappings-testing",
       icon: <Code className="h-4 w-4" />
     },
     {
-      title: "Upload CSV",
+      title: "Upload-CSV API",
       href: "/upload",
       icon: <Upload className="h-4 w-4" />
     },
