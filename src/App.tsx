@@ -73,7 +73,7 @@ const ThemeContext = createContext({
 const useThemeContext = () => useContext(ThemeContext);
 
 // API base URL
-const API_BASE_URL = "https://ayushbandan.duckdns.org";
+const API_BASE_URL = "http://localhost:8000";
 const API_BASE_URL_DISPLAY = "{{base_url}}";
 
 // Animation variants
