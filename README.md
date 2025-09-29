@@ -111,7 +111,7 @@ Node.js (v14 or higher)
 
 npm or yarn
 
-API server running on http://localhost:8000
+API server running on https://ayushbandan.duckdns.org
 
 Installation
 Clone the repository:
@@ -194,7 +194,7 @@ HeroSection: Landing page introduction
 ApiResponseDisplay: formatted API response viewer
 
 API Integration
-The application integrates with a backend API server running on http://localhost:8000 with the following endpoints:
+The application integrates with a backend API server running on https://ayushbandan.duckdns.org with the following endpoints:
 
 Ayurveda: /terminologies/ayurveda/search/
 
