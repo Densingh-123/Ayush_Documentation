@@ -2,6 +2,14 @@ import React, { useState, useEffect, createContext, useContext, useRef } from "r
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+// Add to the imports section
+import { 
+  Heart, 
+  Shield,
+  Users,
+  Activity
+} from "lucide-react";
+
 import { 
   Card, 
   CardContent, 
@@ -146,6 +154,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       href: "/analytics",
       icon: <BarChart3 className="h-4 w-4" />
     },
+    {
+  title: "FHIR API",
+  href: "/fhir",
+  icon: <Heart className="h-4 w-4" />
+    },
+
     // {
     //   title: "Mappings Details",
     //   href: "/mappings",
@@ -342,6 +356,12 @@ const Sidebar = () => {
       href: "/analytics",
       icon: <BarChart3 className="h-4 w-4" />
     },
+    {
+  title: "FHIR API",
+  href: "/fhir",
+  icon: <Heart className="h-4 w-4" />
+},
+
     // {
     //   title: "Mappings Details",
     //   href: "/mappings",
@@ -3749,6 +3769,26 @@ const HomePage = () => {
                 </Button>
               </CardContent>
             </Card>
+            <Card>
+  <CardHeader>
+    <CardTitle className="flex items-center">
+      <Heart className="h-5 w-5 mr-2 text-red-500" />
+      FHIR R4 API
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p className="text-muted-foreground mb-4">
+      Fully FHIR R4 compliant API with ABHA integration and dual coding support.
+    </p>
+    <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
+      <code>GET {API_BASE_URL_DISPLAY}/fhir/Condition?code=diabetes</code>
+    </div>
+    <Button asChild variant="outline">
+      <Link to="/fhir">Explore FHIR API</Link>
+    </Button>
+  </CardContent>
+</Card>
+
 
             <Card className="md:col-span-2">
               <CardHeader>
@@ -3841,6 +3881,443 @@ const HomePage = () => {
   );
 };
 
+// Add the FHIR Page Component
+const FHIRPage = () => {
+  const [selectedResource, setSelectedResource] = useState("Condition");
+  const [patientId, setPatientId] = useState("example-patient-123");
+  const [conditionCode, setConditionCode] = useState("fever");
+  const [responseData, setResponseData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fhirResources = [
+    {
+      value: "Condition",
+      label: "Condition",
+      description: "Represent patient health conditions and diagnoses",
+      endpoint: "/fhir/Condition"
+    },
+    {
+      value: "Patient",
+      label: "Patient",
+      description: "Manage patient demographic information",
+      endpoint: "/fhir/Patient"
+    },
+    {
+      value: "Observation",
+      label: "Observation",
+      description: "Record clinical observations and measurements",
+      endpoint: "/fhir/Observation"
+    },
+    {
+      value: "Procedure",
+      label: "Procedure",
+      description: "Document procedures performed on patients",
+      endpoint: "/fhir/Procedure"
+    },
+    {
+      value: "Medication",
+      label: "Medication",
+      description: "Manage medication information",
+      endpoint: "/fhir/Medication"
+    },
+    {
+      value: "MedicationRequest",
+      label: "MedicationRequest",
+      description: "Record medication orders and prescriptions",
+      endpoint: "/fhir/MedicationRequest"
+    }
+  ];
+
+  const handleFHIRSearch = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let url = '';
+      
+      if (selectedResource === "Condition") {
+        url = `${API_BASE_URL}/fhir/Condition?code=${encodeURIComponent(conditionCode)}`;
+      } else if (selectedResource === "Patient") {
+        url = `${API_BASE_URL}/fhir/Patient?_id=${encodeURIComponent(patientId)}`;
+      } else {
+        url = `${API_BASE_URL}${fhirResources.find(r => r.value === selectedResource)?.endpoint}`;
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching FHIR data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateSampleFHIR = (resourceType) => {
+    const baseSample = {
+      resourceType: "Bundle",
+      type: "searchset",
+      total: 1,
+      entry: []
+    };
+
+    if (resourceType === "Condition") {
+      baseSample.entry = [
+        {
+          resource: {
+            resourceType: "Condition",
+            id: "condition-123",
+            clinicalStatus: {
+              coding: [
+                {
+                  system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                  code: "active",
+                  display: "Active"
+                }
+              ]
+            },
+            verificationStatus: {
+              coding: [
+                {
+                  system: "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                  code: "confirmed",
+                  display: "Confirmed"
+                }
+              ]
+            },
+            category: [
+              {
+                coding: [
+                  {
+                    system: "http://terminology.hl7.org/CodeSystem/condition-category",
+                    code: "encounter-diagnosis",
+                    display: "Encounter Diagnosis"
+                  }
+                ]
+              }
+            ],
+            code: {
+              coding: [
+                {
+                  system: "http://who.int/icd11",
+                  code: "1A72.4",
+                  display: "Gonococcal infection of eye"
+                },
+                {
+                  system: "http://namaste.ayush.gov.in/ayurveda",
+                  code: "EC-3.19",
+                  display: "chronic fever"
+                }
+              ],
+              text: "Chronic fever with eye infection"
+            },
+            subject: {
+              reference: "Patient/example-patient-123",
+              display: "John Doe"
+            },
+            recordedDate: "2024-01-15"
+          }
+        }
+      ];
+    } else if (resourceType === "Patient") {
+      baseSample.entry = [
+        {
+          resource: {
+            resourceType: "Patient",
+            id: "example-patient-123",
+            identifier: [
+              {
+                system: "https://healthid.ndhm.gov.in",
+                value: "123456789012"
+              }
+            ],
+            name: [
+              {
+                use: "official",
+                family: "Doe",
+                given: ["John"]
+              }
+            ],
+            gender: "male",
+            birthDate: "1980-05-15",
+            address: [
+              {
+                use: "home",
+                line: ["123 Main Street"],
+                city: "Mumbai",
+                state: "Maharashtra",
+                postalCode: "400001",
+                country: "India"
+              }
+            ]
+          }
+        }
+      ];
+    }
+
+    return baseSample;
+  };
+
+  return (
+    <div className="px-4 py-8 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold mb-4">FHIR R4 API</h2>
+        <p className="text-muted-foreground">
+          Fully FHIR R4 compliant API for integrating traditional medicine data with modern healthcare systems. 
+          Supports ABHA (Ayushman Bharat Health Account) and India EHR Standards 2016.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Heart className="h-5 w-5 mr-2 text-red-500" />
+                FHIR Resource Explorer
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Explore FHIR R4 resources with integrated traditional medicine coding
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">FHIR Resource</label>
+                  <Select value={selectedResource} onValueChange={setSelectedResource}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select FHIR resource" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fhirResources.map((resource) => (
+                        <SelectItem key={resource.value} value={resource.value}>
+                          {resource.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {fhirResources.find(r => r.value === selectedResource)?.description}
+                  </p>
+                </div>
+                
+                {selectedResource === "Condition" && (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Condition Code</label>
+                    <Input
+                      placeholder="Enter condition code (e.g., fever, diabetes)"
+                      value={conditionCode}
+                      onChange={(e) => setConditionCode(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
+                    />
+                  </div>
+                )}
+                
+                {selectedResource === "Patient" && (
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Patient ID</label>
+                    <Input
+                      placeholder="Enter patient ID"
+                      value={patientId}
+                      onChange={(e) => setPatientId(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
+                    />
+                  </div>
+                )}
+                
+                <Button onClick={handleFHIRSearch} disabled={loading} className="w-full">
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  ) : (
+                    <Search className="h-4 w-4 mr-2" />
+                  )}
+                  Search FHIR Resource
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>FHIR Capability Statement</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                    <Shield className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                    <div className="text-sm font-medium text-blue-900 dark:text-blue-100">FHIR Version</div>
+                    <div className="text-lg font-bold text-blue-700 dark:text-blue-300">R4</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                    <Users className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                    <div className="text-sm font-medium text-green-900 dark:text-green-100">ABHA Ready</div>
+                    <div className="text-lg font-bold text-green-700 dark:text-green-300">Yes</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Supported Resources</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {fhirResources.map((resource) => (
+                      <Badge key={resource.value} variant="outline" className="justify-center">
+                        {resource.label}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Code Systems</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm">ICD-11</span>
+                      <Badge variant="secondary">Supported</Badge>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm">Ayurveda</span>
+                      <Badge variant="secondary">Supported</Badge>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm">Siddha</span>
+                      <Badge variant="secondary">Supported</Badge>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm">Unani</span>
+                      <Badge variant="secondary">Supported</Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                FHIR Endpoints
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {fhirResources.map((resource) => (
+                  <div key={resource.value} className="flex justify-between items-start p-3 bg-muted rounded-lg">
+                    <div className="flex-1">
+                      <span className="font-medium block">{resource.label}</span>
+                      <p className="text-xs text-muted-foreground mt-1">{resource.description}</p>
+                    </div>
+                    <code className="text-xs bg-muted-foreground/10 px-2 py-1 rounded ml-2 flex-shrink-0">
+                      {resource.endpoint}
+                    </code>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="space-y-6">
+          <ApiResponseDisplay data={responseData} loading={loading} error={error} />
+          
+          {!responseData && !loading && !error && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Sample FHIR Response</CardTitle>
+                <p className="text-muted-foreground">
+                  Example {selectedResource} resource with traditional medicine coding
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
+                  <pre className="text-sm text-white">
+                    <code>{JSON.stringify(generateSampleFHIR(selectedResource), null, 2)}</code>
+                  </pre>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          <Card className="mt-6">
+  <CardHeader>
+    <CardTitle>Dual Coding Example</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div className="space-y-4">
+      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+        <h4 className="font-medium mb-2 text-green-900 dark:text-green-100">Traditional + Modern Medicine Coding</h4>
+        <p className="text-sm text-green-800 dark:text-green-200">
+          Each condition can include both ICD-11 codes and traditional medicine codes, 
+          enabling comprehensive health records that respect both systems.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* ICD-11 Code Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-md">ICD-11 Code</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground whitespace-nowrap">System:</span>
+                <code className="text-xs bg-muted px-2 py-1 rounded break-all text-right flex-1 min-w-0">
+                  http://who.int/icd11
+                </code>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground whitespace-nowrap">Code:</span>
+                <span className="font-medium text-right">1A72.4</span>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground whitespace-nowrap">Display:</span>
+                <span className="text-right break-words flex-1 min-w-0">Gonococcal infection</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Ayurveda Code Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-md">Ayurveda Code</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground whitespace-nowrap">System:</span>
+                <code className="text-xs bg-muted px-2 py-1 rounded break-all text-right flex-1 min-w-0">
+                  http://namaste.ayush.gov.in/ayurveda
+                </code>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground whitespace-nowrap">Code:</span>
+                <span className="font-medium text-right">EC-3.19</span>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground whitespace-nowrap">Display:</span>
+                <span className="text-right break-words flex-1 min-w-0">Chronic fever</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+        </div>
+      </div>
+    </div>
+  );
+};
 // Main App Component
 function App() {
   const { theme, setTheme } = useTheme();
@@ -3865,6 +4342,7 @@ function App() {
             <Route path="/all-endpoints" element={<AllEndpointsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/mappings" element={<MappingsPage />} />
+            <Route path="/fhir" element={<FHIRPage />} />
           </Routes>
         </div>
       </div>
