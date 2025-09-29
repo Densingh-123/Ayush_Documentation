@@ -318,7 +318,7 @@ const Sidebar = () => {
       icon: <Database className="h-4 w-4" />
     },
     {
-      title: "Mappings & Testing",
+      title: "Concept Mapping",
       href: "/mappings-testing",
       icon: <Code className="h-4 w-4" />
     },
@@ -1065,9 +1065,11 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex items-center justify-center gap-4 mb-12 flex-wrap"
           >
-            <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
-              Get Started
-            </Button>
+         <Link to="/all-endpoints">
+  <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
+    Get Started
+  </Button>
+</Link>
             <Link to="/all-endpoints">
               <Button variant="outline" size="lg">
                 View API Reference
@@ -2464,188 +2466,121 @@ const MappingsTestingPage = () => {
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Mappings & Testing API</h2>
+        <h2 className="text-3xl font-bold mb-4">Concept Mapping</h2>
         <p className="text-muted-foreground">
           Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores, and test all API endpoints.
         </p>
       </div>
       
       <Tabs defaultValue="mappings" className="mb-8">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="mappings">Mappings Search</TabsTrigger>
-          <TabsTrigger value="testing">Endpoint Testing</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="mappings">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Search Mappings</CardTitle>
-                  <p className="text-muted-foreground">Find mappings between traditional medicine systems and ICD-11</p>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">System</label>
-                      <Select value={system} onValueChange={setSystem}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select system" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ayurveda">Ayurveda</SelectItem>
-                          <SelectItem value="siddha">Siddha</SelectItem>
-                          <SelectItem value="unani">Unani</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Search Query</label>
-                      <Input
-                        placeholder="Enter search term..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Min Confidence</label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0.1"
-                        max="1.0"
-                        value={minConfidence}
-                        onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
-                      />
-                    </div>
-                  </div>
-                  
-                  <Button onClick={handleSearch} disabled={loading}>
-                    {loading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    ) : (
-                      <Search className="h-4 w-4 mr-2" />
-                    )}
-                    Search Mappings
-                  </Button>
-                </CardContent>
-              </Card>
+  <TabsList className="grid w-full grid-cols-2">
+    <TabsTrigger value="mappings">Combined Search</TabsTrigger>
+    <TabsTrigger value="testing">Endpoint Testing</TabsTrigger>
+  </TabsList>
+
+  {/* First Tab: Only Combined Search (Full Width) */}
+  <TabsContent value="mappings">
+    <div className="w-full">
+      <Card className="mb-8 w-full">
+        <CardHeader>
+          <CardTitle>Combined Search</CardTitle>
+          <p className="text-muted-foreground">
+            Search across all ICD-11 terms and their related NAMASTE concepts
+          </p>
+        </CardHeader>
+        <CardContent>
+          <CombinedSearchComponent />
+        </CardContent>
+      </Card>
+    </div>
+  </TabsContent>
+
+  {/* Second Tab: Endpoint Testing */}
+  <TabsContent value="testing">
+    <div className="w-full">
+      <Card className="mb-8 w-full">
+        <CardHeader>
+          <CardTitle>Test Endpoints</CardTitle>
+          <p className="text-muted-foreground">
+            Select an endpoint and enter parameters to test
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Select Endpoint</label>
+              <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select endpoint" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
+                  <SelectItem value="siddha">Siddha Search</SelectItem>
+                  <SelectItem value="unani">Unani Search</SelectItem>
+                  <SelectItem value="icd11">ICD-11 Search</SelectItem>
+                  <SelectItem value="combined">Combined Search</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div>
-              <Card className="mb-8 w-full">
-                <CardHeader>
-                  <CardTitle>Combined Search</CardTitle>
-                  <p className="text-muted-foreground">
-                    Search across all ICD-11 terms and their related NAMASTE concepts
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <CombinedSearchComponent />
-                </CardContent>
-              </Card>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {selectedEndpoint === "combined"
+                  ? "Search Query (optional)"
+                  : "Search Query"}
+              </label>
+              <Input
+                placeholder={
+                  selectedEndpoint === "combined"
+                    ? "Enter search term (default: diabetes)"
+                    : "Enter search term"
+                }
+                value={testQuery}
+                onChange={(e) => setTestQuery(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleTest()}
+              />
             </div>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="testing">
-          <div>
-            <Card className="mb-8 w-full">
-              <CardHeader>
-                <CardTitle>Test Endpoints</CardTitle>
-                <p className="text-muted-foreground">
-                  Select an endpoint and enter parameters to test
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Select Endpoint</label>
-                    <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select endpoint" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
-                        <SelectItem value="siddha">Siddha Search</SelectItem>
-                        <SelectItem value="unani">Unani Search</SelectItem>
-                        <SelectItem value="icd11">ICD-11 Search</SelectItem>
-                        <SelectItem value="mappings">Mappings</SelectItem>
-                        <SelectItem value="combined">Combined Search</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      {selectedEndpoint === "mappings" || selectedEndpoint === "combined"
-                        ? "Search Query (optional)"
-                        : "Search Query"}
-                    </label>
-                    <Input
-                      placeholder={
-                        selectedEndpoint === "mappings"
-                          ? "Enter search term (default: fever)"
-                          : selectedEndpoint === "combined"
-                          ? "Enter search term (default: diabetes)"
-                          : "Enter search term"
-                      }
-                      value={testQuery}
-                      onChange={(e) => setTestQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleTest()}
-                    />
-                  </div>
-                </div>
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <Button onClick={handleTest} disabled={loading} className="md:w-auto w-full">
+              {loading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              ) : (
+                <Code className="h-4 w-4 mr-2" />
+              )}
+              Test Endpoint
+            </Button>
 
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <Button onClick={handleTest} disabled={loading} className="md:w-auto w-full">
-                    {loading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    ) : (
-                      <Code className="h-4 w-4 mr-2" />
-                    )}
-                    Test Endpoint
-                  </Button>
-
-                  <div
-                    className="text-sm text-muted-foreground cursor-pointer flex-1"
-                    onClick={() =>
-                      navigator.clipboard.writeText(
-                        selectedEndpoint === "mappings"
-                          ? `${API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=${
-                              testQuery || "fever"
-                            }&min_confidence=0.1`
-                          : selectedEndpoint === "combined"
-                          ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
-                              testQuery || "diabetes"
-                            }&fuzzy=true&use_fts=true&threshold=0.2`
-                          : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
-                      )
-                    }
-                    title="Click to copy"
-                  >
-                    Endpoint:{" "}
-                    <code className="bg-muted px-2 py-1 rounded break-all overflow-x-auto max-w-full">
-                      {selectedEndpoint === "mappings"
-                        ? `${API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=${
-                            testQuery || "fever"
-                          }&min_confidence=0.1`
-                        : selectedEndpoint === "combined"
-                        ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
-                            testQuery || "diabetes"
-                          }&fuzzy=true&use_fts=true&threshold=0.2`
-                        : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
-                    </code>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div
+              className="text-sm text-muted-foreground cursor-pointer flex-1"
+              onClick={() =>
+                navigator.clipboard.writeText(
+                  selectedEndpoint === "combined"
+                    ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
+                        testQuery || "diabetes"
+                      }&fuzzy=true&use_fts=true&threshold=0.2`
+                    : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
+                )
+              }
+              title="Click to copy"
+            >
+              Endpoint:{" "}
+              <code className="bg-muted px-2 py-1 rounded break-all overflow-x-auto max-w-full">
+                {selectedEndpoint === "combined"
+                  ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
+                      testQuery || "diabetes"
+                    }&fuzzy=true&use_fts=true&threshold=0.2`
+                  : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
+              </code>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
+    </div>
+  </TabsContent>
+</Tabs>
+
       
       <ApiResponseDisplay data={responseData} loading={loading} error={error} />
       
