@@ -30,7 +30,9 @@ import {
   Upload,
   Zap,
   Menu,
-  Map
+  Map,
+  Table,
+  Eye
 } from "lucide-react";
 // ------------------------------------------------
 
@@ -142,16 +144,10 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       icon: <BarChart3 className="h-4 w-4" />
     },
     {
-  title: "FHIR API",
-  href: "/fhir",
-  icon: <Heart className="h-4 w-4" />
+      title: "FHIR API",
+      href: "/fhir",
+      icon: <Heart className="h-4 w-4" />
     },
-
-    // {
-    //   title: "Mappings Details",
-    //   href: "/mappings",
-    //   icon: <Map className="h-4 w-4" />
-    // }
   ];
 
   return (
@@ -344,16 +340,10 @@ const Sidebar = () => {
       icon: <BarChart3 className="h-4 w-4" />
     },
     {
-  title: "FHIR API",
-  href: "/fhir",
-  icon: <Heart className="h-4 w-4" />
-},
-
-    // {
-    //   title: "Mappings Details",
-    //   href: "/mappings",
-    //   icon: <Map className="h-4 w-4" />
-    // }
+      title: "FHIR API",
+      href: "/fhir",
+      icon: <Heart className="h-4 w-4" />
+    },
   ];
 
   return (
@@ -837,7 +827,7 @@ const AIChatbot = () => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-blue-500 hover:bg-blue-600 z-50"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-[#1e88e5] hover:bg-[#1e88e5]/90 z-50"
         size="sm"
       >
         <MessageCircle className="h-6 w-6" />
@@ -846,11 +836,11 @@ const AIChatbot = () => {
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 w-96 h-[500px] shadow-xl z-50 flex flex-col">
+    <Card className="fixed bottom-6 right-6 w-full max-w-sm h-[500px] shadow-xl z-50 flex flex-col mx-4 sm:mx-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Bot className="h-5 w-5 text-blue-500" />
+            <Bot className="h-5 w-5 text-[#1e88e5]" />
             API Assistant
           </CardTitle>
           <Button
@@ -867,7 +857,7 @@ const AIChatbot = () => {
             <Badge
               key={index}
               variant="secondary"
-              className="cursor-pointer hover:bg-blue-500/10 text-xs"
+              className="cursor-pointer hover:bg-[#1e88e5]/10 text-xs"
               onClick={() => handleQuickAction(action)}
             >
               {action}
@@ -887,14 +877,14 @@ const AIChatbot = () => {
                 }`}
               >
                 {message.sender === "bot" && (
-                  <div className="h-6 w-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Bot className="h-3 w-3 text-blue-500" />
+                  <div className="h-6 w-6 rounded-full bg-[#1e88e5]/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Bot className="h-3 w-3 text-[#1e88e5]" />
                   </div>
                 )}
                 <div
                   className={`max-w-[250px] rounded-lg p-2 text-sm ${
                     message.sender === "user"
-                      ? "bg-blue-500 text-white"
+                      ? "bg-[#1e88e5] text-white"
                       : "bg-muted"
                   }`}
                 >
@@ -902,7 +892,7 @@ const AIChatbot = () => {
                   {message.hasMore && message.fullData && message.system && message.query && (
                     <Button
                       variant="link"
-                      className="p-0 h-auto text-blue-500"
+                      className="p-0 h-auto text-[#1e88e5]"
                       onClick={() => handleSeeMore(message.id, message.fullData, message.system!, message.query!)}
                     >
                       See more
@@ -931,7 +921,7 @@ const AIChatbot = () => {
           <Button
             onClick={handleSendMessage}
             size="sm"
-            className="bg-blue-500 hover:bg-blue-600"
+            className="bg-[#1e88e5] hover:bg-[#1e88e5]/90"
           >
             <Send className="h-4 w-4" />
           </Button>
@@ -1041,7 +1031,7 @@ const HeroSection = () => {
             transition={{ duration: 0.8 }}
             className="flex justify-center mb-6"
           >
-            <Badge className="bg-blue-500/10 text-white-500 border-blue-500/20 px-4 py-1">
+            <Badge className="bg-[#1e88e5]/10 text-[#1e88e5] border-[#1e88e5]/20 px-4 py-1">
               FHIR R4 Compliant • ICD-11 TM2 • India EHR Standards 2016
             </Badge>
           </motion.div>
@@ -1050,7 +1040,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl font-bold mb-6 colors-primary text-[#1e88e5] italic"
+            className="text-4xl md:text-5xl font-bold mb-6 colors-primary text-[#1e88e5] italic"
           >
             NAMASTE & ICD-11 Integration API
           </motion.h1>
@@ -1059,7 +1049,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed"
+            className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed"
           >
             Comprehensive documentation for India's traditional medicine
             terminologies integrated with WHO ICD-11 TM2. Explore endpoints,
@@ -1072,11 +1062,11 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex items-center justify-center gap-4 mb-12 flex-wrap"
           >
-         <Link to="/all-endpoints">
-  <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
-    Get Started
-  </Button>
-</Link>
+            <Link to="/all-endpoints">
+              <Button size="lg" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90">
+                Get Started
+              </Button>
+            </Link>
             <Link to="/all-endpoints">
               <Button variant="outline" size="lg">
                 View API Reference
@@ -1134,7 +1124,6 @@ const HeroSection = () => {
   );
 };
 
-
 // Copy to clipboard function
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text).then(() => {
@@ -1145,12 +1134,14 @@ const copyToClipboard = (text) => {
   });
 };
 
-// API Response Display Component
+// Enhanced API Response Display Component with Table View
 const ApiResponseDisplay = ({ data, loading, error }) => {
+  const [viewMode, setViewMode] = useState<'json' | 'table'>('json');
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1e88e5]"></div>
         <span className="ml-2">Loading data...</span>
       </div>
     );
@@ -1178,22 +1169,94 @@ const ApiResponseDisplay = ({ data, loading, error }) => {
     );
   }
 
+  // Function to render data in table view
+  const renderTableView = (data: any) => {
+    if (!data.results || !Array.isArray(data.results) || data.results.length === 0) {
+      return (
+        <div className="text-center py-8 text-muted-foreground">
+          No results to display in table view
+        </div>
+      );
+    }
+
+    const results = data.results;
+    const headers = Object.keys(results[0]);
+
+    return (
+      <ScrollArea className="h-96 w-full">
+        <table className="w-full text-sm">
+          <thead className="sticky top-0 bg-muted">
+            <tr>
+              {headers.map((header) => (
+                <th key={header} className="px-4 py-2 text-left font-medium capitalize">
+                  {header.replace(/_/g, ' ')}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {results.map((row, index) => (
+              <tr key={index} className={index % 2 === 0 ? 'bg-background' : 'bg-muted/50'}>
+                {headers.map((header) => (
+                  <td key={header} className="px-4 py-2 border-b">
+                    {typeof row[header] === 'object' 
+                      ? JSON.stringify(row[header]) 
+                      : String(row[header] || 'N/A')}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </ScrollArea>
+    );
+  };
+
   return (
-    <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-white text-sm font-medium">Response</span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => copyToClipboard(JSON.stringify(data, null, 2))}
-          className="h-8 w-8 p-0 text-white hover:bg-white/10"
-        >
-          <Copy className="h-4 w-4" />
-        </Button>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <span className="text-sm font-medium">Response</span>
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === 'table' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('table')}
+            className="h-8"
+          >
+            <Table className="h-4 w-4 mr-1" />
+            Table
+          </Button>
+          <Button
+            variant={viewMode === 'json' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('json')}
+            className="h-8"
+          >
+            <Code className="h-4 w-4 mr-1" />
+            JSON
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => copyToClipboard(JSON.stringify(data, null, 2))}
+            className="h-8"
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-      <pre className="text-sm text-white overflow-auto">
-        <code>{JSON.stringify(data, null, 2)}</code>
-      </pre>
+
+      {viewMode === 'json' ? (
+        <ScrollArea className="h-96 w-full rounded-md border">
+          <pre className="p-4 text-sm bg-[#1E1E1E] text-white">
+            <code>{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        </ScrollArea>
+      ) : (
+        <div className="border rounded-md overflow-hidden">
+          {renderTableView(data)}
+        </div>
+      )}
     </div>
   );
 };
@@ -1235,8 +1298,8 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
         <CardTitle>{title}</CardTitle>
         <p className="text-muted-foreground">{description}</p>
       </CardHeader>
-      <CardContent>
-        <div className="flex gap-2 mb-6">
+      <CardContent className="space-y-6">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             placeholder="Enter search term..."
             value={query}
@@ -1244,7 +1307,7 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
             onKeyPress={(e) => e.key === "Enter" && handleSearch()}
             className="flex-1"
           />
-          <Button onClick={handleSearch} disabled={loading}>
+          <Button onClick={handleSearch} disabled={loading} className="bg-[#1e88e5] hover:bg-[#1e88e5]/90">
             {loading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
             ) : (
@@ -1260,22 +1323,24 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
           <div className="mt-6">
             <h4 className="font-medium mb-3">Endpoint Information</h4>
             <div className="bg-muted rounded-lg p-4 text-sm">
-              <div className="flex items-center mb-2">
-                <span className="font-medium mr-2">URL:</span>
-                <code className="bg-muted-foreground/10 px-2 py-1 rounded overflow-x-auto max-w-full">
-                  {API_BASE_URL_DISPLAY}{endpoint}{query}
-                </code>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="ml-2 h-8 w-8 p-0"
-                  onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}${endpoint}${query}`)}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                <span className="font-medium min-w-16">URL:</span>
+                <div className="flex-1 flex items-center gap-2">
+                  <code className="bg-muted-foreground/10 px-2 py-1 rounded flex-1 overflow-x-auto">
+                    {API_BASE_URL_DISPLAY}{endpoint}{query}
+                  </code>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}${endpoint}${query}`)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center">
-                <span className="font-medium mr-2">Method:</span>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Method:</span>
                 <Badge variant="outline">GET</Badge>
               </div>
             </div>
@@ -1329,8 +1394,8 @@ const CombinedSearchComponent = () => {
           Search across all ICD-11 terms and their related NAMASTE concepts in one API call.
         </p>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Search Query</label>
             <Input
@@ -1364,36 +1429,38 @@ const CombinedSearchComponent = () => {
             />
           </div>
           
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="fuzzy"
-                checked={fuzzy}
-                onChange={(e) => setFuzzy(e.target.checked)}
-                className="rounded border-gray-300"
-              />
-              <label htmlFor="fuzzy" className="text-sm font-medium">
-                Fuzzy Search
-              </label>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="fts"
-                checked={useFts}
-                onChange={(e) => setUseFts(e.target.checked)}
-                className="rounded border-gray-300"
-              />
-              <label htmlFor="fts" className="text-sm font-medium">
-                Full-Text Search
-              </label>
+          <div className="flex flex-col gap-2 justify-end">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="fuzzy"
+                  checked={fuzzy}
+                  onChange={(e) => setFuzzy(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="fuzzy" className="text-sm font-medium">
+                  Fuzzy Search
+                </label>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="fts"
+                  checked={useFts}
+                  onChange={(e) => setUseFts(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="fts" className="text-sm font-medium">
+                  Full-Text Search
+                </label>
+              </div>
             </div>
           </div>
         </div>
         
-        <Button onClick={handleSearch} disabled={loading} className="w-full">
+        <Button onClick={handleSearch} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
           {loading ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
           ) : (
@@ -1408,22 +1475,24 @@ const CombinedSearchComponent = () => {
           <div className="mt-6">
             <h4 className="font-medium mb-3">Endpoint Information</h4>
             <div className="bg-muted rounded-lg p-4 text-sm">
-              <div className="flex items-center mb-2">
-                <span className="font-medium mr-2">URL:</span>
-                <code className="bg-muted-foreground/10 px-2 py-1 rounded overflow-x-auto max-w-full">
-                  {API_BASE_URL_DISPLAY}/terminologies/search/combined/?q={query}&fuzzy={fuzzy}&use_fts={useFts}&threshold={threshold}&page_size={pageSize}
-                </code>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="ml-2 h-8 w-8 p-0"
-                  onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${query}&fuzzy=${fuzzy}&use_fts=${useFts}&threshold=${threshold}&page_size=${pageSize}`)}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                <span className="font-medium min-w-16">URL:</span>
+                <div className="flex-1 flex items-center gap-2">
+                  <code className="bg-muted-foreground/10 px-2 py-1 rounded flex-1 overflow-x-auto">
+                    {API_BASE_URL_DISPLAY}/terminologies/search/combined/?q={query}&fuzzy={fuzzy}&use_fts={useFts}&threshold={threshold}&page_size={pageSize}
+                  </code>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${query}&fuzzy=${fuzzy}&use_fts=${useFts}&threshold=${threshold}&page_size=${pageSize}`)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center">
-                <span className="font-medium mr-2">Method:</span>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Method:</span>
                 <Badge variant="outline">GET</Badge>
               </div>
             </div>
@@ -1512,63 +1581,61 @@ const UploadPage = () => {
               <CardTitle>Upload CSV File</CardTitle>
               <p className="text-muted-foreground">{systemInfo[selectedSystem].description}</p>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Select System</label>
-                  <Select value={selectedSystem} onValueChange={setSelectedSystem}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select system" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ayurveda">Ayurveda</SelectItem>
-                      <SelectItem value="siddha">Siddha</SelectItem>
-                      <SelectItem value="unani">Unani</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">CSV File</label>
-                  <Input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileChange}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Required columns: {systemInfo[selectedSystem].columns}
-                  </p>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="updateSearchVector"
-                    checked={updateSearchVector}
-                    onChange={(e) => setUpdateSearchVector(e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                  <label htmlFor="updateSearchVector" className="text-sm font-medium">
-                    Update search vectors after import
-                  </label>
-                </div>
-                
-                <Button onClick={handleUpload} disabled={loading} className="w-full">
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Upload className="h-4 w-4 mr-2" />
-                  )}
-                  Upload CSV
-                </Button>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Select System</label>
+                <Select value={selectedSystem} onValueChange={setSelectedSystem}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select system" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ayurveda">Ayurveda</SelectItem>
+                    <SelectItem value="siddha">Siddha</SelectItem>
+                    <SelectItem value="unani">Unani</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">CSV File</label>
+                <Input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileChange}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Required columns: {systemInfo[selectedSystem].columns}
+                </p>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="updateSearchVector"
+                  checked={updateSearchVector}
+                  onChange={(e) => setUpdateSearchVector(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="updateSearchVector" className="text-sm font-medium">
+                  Update search vectors after import
+                </label>
+              </div>
+              
+              <Button onClick={handleUpload} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
+                {loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                ) : (
+                  <Upload className="h-4 w-4 mr-2" />
+                )}
+                Upload CSV
+              </Button>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                <FileText className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Endpoint Information
               </CardTitle>
             </CardHeader>
@@ -1724,66 +1791,64 @@ const AutocompletePage = () => {
               <CardTitle>Autocomplete Search</CardTitle>
               <p className="text-muted-foreground">{systemInfo[selectedSystem].description}</p>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Select System</label>
-                  <Select value={selectedSystem} onValueChange={setSelectedSystem}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select system" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ayurveda">Ayurveda</SelectItem>
-                      <SelectItem value="siddha">Siddha</SelectItem>
-                      <SelectItem value="unani">Unani</SelectItem>
-                      <SelectItem value="icd11">ICD-11</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Search Term</label>
-                  <Input
-                    placeholder="Enter search term..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Searches across: {systemInfo[selectedSystem].searchFields}
-                  </p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Limit</label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={limit}
-                    onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Maximum results to return (default: 10, max: 20)
-                  </p>
-                </div>
-                
-                <Button onClick={handleSearch} disabled={loading} className="w-full">
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Zap className="h-4 w-4 mr-2" />
-                  )}
-                  Autocomplete Search
-                </Button>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Select System</label>
+                <Select value={selectedSystem} onValueChange={setSelectedSystem}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select system" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ayurveda">Ayurveda</SelectItem>
+                    <SelectItem value="siddha">Siddha</SelectItem>
+                    <SelectItem value="unani">Unani</SelectItem>
+                    <SelectItem value="icd11">ICD-11</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Search Term</label>
+                <Input
+                  placeholder="Enter search term..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Searches across: {systemInfo[selectedSystem].searchFields}
+                </p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Limit</label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={limit}
+                  onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Maximum results to return (default: 10, max: 20)
+                </p>
+              </div>
+              
+              <Button onClick={handleSearch} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
+                {loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                ) : (
+                  <Zap className="h-4 w-4 mr-2" />
+                )}
+                Autocomplete Search
+              </Button>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                <FileText className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Endpoint Information
               </CardTitle>
             </CardHeader>
@@ -1828,14 +1893,16 @@ const AutocompletePage = () => {
                 <p className="text-muted-foreground">Found {responseData.length} matching terms</p>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  {responseData.map((term, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                      <span className="font-medium">{term}</span>
-                      <Badge variant="outline">#{index + 1}</Badge>
-                    </div>
-                  ))}
-                </div>
+                <ScrollArea className="h-64">
+                  <div className="space-y-2">
+                    {responseData.map((term, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <span className="font-medium">{term}</span>
+                        <Badge variant="outline">#{index + 1}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           )}
@@ -1867,7 +1934,7 @@ const AyurvedaPage = () => {
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <Database className="h-5 w-5 mr-2 text-blue-500" />
+                <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Response Structure
               </CardTitle>
             </CardHeader>
@@ -1875,9 +1942,10 @@ const AyurvedaPage = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
-                    <code>
-                      {`{
+                  <ScrollArea className="h-48">
+                    <div className="bg-muted p-3 rounded text-sm">
+                      <code>
+                        {`{
   "count": 283,
   "next": "${API_BASE_URL_DISPLAY}/terminologies/ayurveda/search/?page=2&q=diseane",
   "previous": null,
@@ -1892,8 +1960,9 @@ const AyurvedaPage = () => {
     ...
   ]
 }`}
-                    </code>
-                  </div>
+                      </code>
+                    </div>
+                  </ScrollArea>
                 </div>
               </div>
             </CardContent>
@@ -1902,7 +1971,7 @@ const AyurvedaPage = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                <FileText className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Field Descriptions
               </CardTitle>
             </CardHeader>
@@ -2005,7 +2074,7 @@ const SiddhaPage = () => {
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <Database className="h-5 w-5 mr-2 text-purple-500" />
+                <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Response Structure
               </CardTitle>
             </CardHeader>
@@ -2013,9 +2082,10 @@ const SiddhaPage = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
-                    <code>
-                      {`{
+                  <ScrollArea className="h-48">
+                    <div className="bg-muted p-3 rounded text-sm">
+                      <code>
+                        {`{
   "count": 138,
   "next": "${API_BASE_URL_DISPLAY}/terminologies/siddha/search/?page=2&q=diseane",
   "previous": null,
@@ -2030,8 +2100,9 @@ const SiddhaPage = () => {
     ...
   ]
 }`}
-                    </code>
-                  </div>
+                      </code>
+                    </div>
+                  </ScrollArea>
                 </div>
               </div>
             </CardContent>
@@ -2040,7 +2111,7 @@ const SiddhaPage = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-purple-500" />
+                <FileText className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Field Descriptions
               </CardTitle>
             </CardHeader>
@@ -2143,7 +2214,7 @@ const UnaniPage = () => {
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <Database className="h-5 w-5 mr-2 text-green-500" />
+                <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Response Structure
               </CardTitle>
             </CardHeader>
@@ -2151,9 +2222,10 @@ const UnaniPage = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
-                    <code>
-                      {`{
+                  <ScrollArea className="h-48">
+                    <div className="bg-muted p-3 rounded text-sm">
+                      <code>
+                        {`{
   "count": 139,
   "next": "${API_BASE_URL_DISPLAY}/terminologies/unani/search/?page=2&q=diseane",
   "previous": null,
@@ -2168,8 +2240,9 @@ const UnaniPage = () => {
     ...
   ]
 }`}
-                    </code>
-                  </div>
+                      </code>
+                    </div>
+                  </ScrollArea>
                 </div>
               </div>
             </CardContent>
@@ -2178,7 +2251,7 @@ const UnaniPage = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-green-500" />
+                <FileText className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Field Descriptions
               </CardTitle>
             </CardHeader>
@@ -2282,7 +2355,7 @@ const ICD11Page = () => {
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <Database className="h-5 w-5 mr-2 text-orange-500" />
+                <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Response Structure
               </CardTitle>
             </CardHeader>
@@ -2290,9 +2363,10 @@ const ICD11Page = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
-                    <code>
-                      {`{
+                  <ScrollArea className="h-48">
+                    <div className="bg-muted p-3 rounded text-sm">
+                      <code>
+                        {`{
   "count": 6,
   "next": null,
   "previous": null,
@@ -2306,8 +2380,9 @@ const ICD11Page = () => {
     ...
   ]
 }`}
-                    </code>
-                  </div>
+                      </code>
+                    </div>
+                  </ScrollArea>
                 </div>
               </div>
             </CardContent>
@@ -2316,7 +2391,7 @@ const ICD11Page = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-orange-500" />
+                <FileText className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 Field Descriptions
               </CardTitle>
             </CardHeader>
@@ -2480,114 +2555,108 @@ const MappingsTestingPage = () => {
       </div>
       
       <Tabs defaultValue="mappings" className="mb-8">
-  <TabsList className="grid w-full grid-cols-2">
-    <TabsTrigger value="mappings">Combined Search</TabsTrigger>
-    <TabsTrigger value="testing">Endpoint Testing</TabsTrigger>
-  </TabsList>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="mappings">Combined Search</TabsTrigger>
+          <TabsTrigger value="testing">Endpoint Testing</TabsTrigger>
+        </TabsList>
 
-  {/* First Tab: Only Combined Search (Full Width) */}
-  <TabsContent value="mappings">
-    <div className="w-full">
-      <Card className="mb-8 w-full">
-        <CardHeader>
-          <CardTitle>Combined Search</CardTitle>
-          <p className="text-muted-foreground">
-            Search across all ICD-11 terms and their related NAMASTE concepts
-          </p>
-        </CardHeader>
-        <CardContent>
-          <CombinedSearchComponent />
-        </CardContent>
-      </Card>
-    </div>
-  </TabsContent>
+        <TabsContent value="mappings">
+          <Card className="mb-8 w-full">
+            <CardHeader>
+              <CardTitle>Combined Search</CardTitle>
+              <p className="text-muted-foreground">
+                Search across all ICD-11 terms and their related NAMASTE concepts
+              </p>
+            </CardHeader>
+            <CardContent>
+              <CombinedSearchComponent />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-  {/* Second Tab: Endpoint Testing */}
-  <TabsContent value="testing">
-    <div className="w-full">
-      <Card className="mb-8 w-full">
-        <CardHeader>
-          <CardTitle>Test Endpoints</CardTitle>
-          <p className="text-muted-foreground">
-            Select an endpoint and enter parameters to test
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Select Endpoint</label>
-              <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select endpoint" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
-                  <SelectItem value="siddha">Siddha Search</SelectItem>
-                  <SelectItem value="unani">Unani Search</SelectItem>
-                  <SelectItem value="icd11">ICD-11 Search</SelectItem>
-                  <SelectItem value="combined">Combined Search</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <TabsContent value="testing">
+          <Card className="mb-8 w-full">
+            <CardHeader>
+              <CardTitle>Test Endpoints</CardTitle>
+              <p className="text-muted-foreground">
+                Select an endpoint and enter parameters to test
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Select Endpoint</label>
+                  <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select endpoint" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
+                      <SelectItem value="siddha">Siddha Search</SelectItem>
+                      <SelectItem value="unani">Unani Search</SelectItem>
+                      <SelectItem value="icd11">ICD-11 Search</SelectItem>
+                      <SelectItem value="combined">Combined Search</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                {selectedEndpoint === "combined"
-                  ? "Search Query (optional)"
-                  : "Search Query"}
-              </label>
-              <Input
-                placeholder={
-                  selectedEndpoint === "combined"
-                    ? "Enter search term (default: diabetes)"
-                    : "Enter search term"
-                }
-                value={testQuery}
-                onChange={(e) => setTestQuery(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleTest()}
-              />
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    {selectedEndpoint === "combined"
+                      ? "Search Query (optional)"
+                      : "Search Query"}
+                  </label>
+                  <Input
+                    placeholder={
+                      selectedEndpoint === "combined"
+                        ? "Enter search term (default: diabetes)"
+                        : "Enter search term"
+                    }
+                    value={testQuery}
+                    onChange={(e) => setTestQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleTest()}
+                  />
+                </div>
+              </div>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <Button onClick={handleTest} disabled={loading} className="md:w-auto w-full">
-              {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              ) : (
-                <Code className="h-4 w-4 mr-2" />
-              )}
-              Test Endpoint
-            </Button>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <Button onClick={handleTest} disabled={loading} className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 sm:w-auto w-full">
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  ) : (
+                    <Code className="h-4 w-4 mr-2" />
+                  )}
+                  Test Endpoint
+                </Button>
 
-            <div
-              className="text-sm text-muted-foreground cursor-pointer flex-1"
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  selectedEndpoint === "combined"
-                    ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
-                        testQuery || "diabetes"
-                      }&fuzzy=true&use_fts=true&threshold=0.2`
-                    : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
-                )
-              }
-              title="Click to copy"
-            >
-              Endpoint:{" "}
-              <code className="bg-muted px-2 py-1 rounded break-all overflow-x-auto max-w-full">
-                {selectedEndpoint === "combined"
-                  ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
-                      testQuery || "diabetes"
-                    }&fuzzy=true&use_fts=true&threshold=0.2`
-                  : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
-              </code>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  </TabsContent>
-</Tabs>
-
+                <div className="text-sm text-muted-foreground cursor-pointer flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <span>Endpoint:</span>
+                    <code 
+                      className="bg-muted px-2 py-1 rounded break-all overflow-x-auto max-w-full cursor-pointer"
+                      onClick={() =>
+                        navigator.clipboard.writeText(
+                          selectedEndpoint === "combined"
+                            ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
+                                testQuery || "diabetes"
+                              }&fuzzy=true&use_fts=true&threshold=0.2`
+                            : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
+                        )
+                      }
+                    >
+                      {selectedEndpoint === "combined"
+                        ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
+                            testQuery || "diabetes"
+                          }&fuzzy=true&use_fts=true&threshold=0.2`
+                        : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
       
       <ApiResponseDisplay data={responseData} loading={loading} error={error} />
       
@@ -2670,266 +2739,10 @@ const MappingsTestingPage = () => {
   );
 };
 
-// Mappings Details Page Component
-const MappingsPage = () => {
-  const [selectedSystem, setSelectedSystem] = useState("siddha");
-  const [conceptId, setConceptId] = useState("");
-  const [minConfidence, setMinConfidence] = useState(0.5);
-  const [validatedOnly, setValidatedOnly] = useState(false);
-  const [includeEmbeddings, setIncludeEmbeddings] = useState(false);
-  const [responseData, setResponseData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleFetchDetails = async () => {
-    if (!conceptId.trim()) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      let url = '';
-      
-      if (selectedSystem === 'siddha') {
-        url = `${API_BASE_URL}/namasthe_mapping/siddha/${conceptId}/detail/?min_confidence=${minConfidence}&validated_only=${validatedOnly}&include_embeddings=${includeEmbeddings}`;
-      } else if (selectedSystem === 'unani') {
-        url = `${API_BASE_URL}/namasthe_mapping/unani/${conceptId}/detail/?min_confidence=${minConfidence}&validated_only=${validatedOnly}&include_embeddings=${includeEmbeddings}`;
-      } else if (selectedSystem === 'icd11') {
-        url = `${API_BASE_URL}/namasthe_mapping/icd11/${conceptId}/detail/?min_confidence=${minConfidence}&validated_only=${validatedOnly}`;
-      }
-      
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setResponseData(data);
-    } catch (err) {
-      setError(err.message);
-      console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const systemInfo = {
-    siddha: {
-      description: "Retrieve detailed information for a Siddha concept with all mapped ICD-11 terms",
-      exampleId: "123"
-    },
-    unani: {
-      description: "Retrieve detailed information for an Unani concept with all mapped ICD-11 terms",
-      exampleId: "123"
-    },
-    icd11: {
-      description: "Retrieve detailed information for an ICD-11 concept with all related NAMASTE concepts",
-      exampleId: "123"
-    }
-  };
-
-  return (
-    <div className="px-4 py-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Mappings Details API</h2>
-        <p className="text-muted-foreground">
-          Get detailed mapping information for specific concepts with comprehensive statistics and quality metrics.
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Fetch Concept Details</CardTitle>
-              <p className="text-muted-foreground">{systemInfo[selectedSystem].description}</p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Select System</label>
-                  <Select value={selectedSystem} onValueChange={setSelectedSystem}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select system" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="siddha">Siddha</SelectItem>
-                      <SelectItem value="unani">Unani</SelectItem>
-                      <SelectItem value="icd11">ICD-11</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Concept ID</label>
-                  <Input
-                    placeholder={`Enter concept ID (e.g., ${systemInfo[selectedSystem].exampleId})`}
-                    value={conceptId}
-                    onChange={(e) => setConceptId(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleFetchDetails()}
-                  />
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Minimum Confidence</label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0.0"
-                    max="1.0"
-                    value={minConfidence}
-                    onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
-                  />
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="validatedOnly"
-                    checked={validatedOnly}
-                    onChange={(e) => setValidatedOnly(e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                  <label htmlFor="validatedOnly" className="text-sm font-medium">
-                    Show only validated mappings
-                  </label>
-                </div>
-                
-                {selectedSystem !== 'icd11' && (
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="includeEmbeddings"
-                      checked={includeEmbeddings}
-                      onChange={(e) => setIncludeEmbeddings(e.target.checked)}
-                      className="rounded border-gray-300"
-                    />
-                    <label htmlFor="includeEmbeddings" className="text-sm font-medium">
-                      Include embeddings
-                    </label>
-                  </div>
-                )}
-                
-                <Button onClick={handleFetchDetails} disabled={loading} className="w-full">
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Database className="h-4 w-4 mr-2" />
-                  )}
-                  Fetch Concept Details
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-blue-500" />
-                Endpoint Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <h4 className="font-medium text-sm mb-1">Method</h4>
-                  <Badge variant="outline" className="mb-2">GET</Badge>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-sm mb-1">URL</h4>
-                  <div className="bg-muted p-2 rounded text-sm overflow-x-auto">
-                    <code>{`${API_BASE_URL_DISPLAY}/namasthe_mapping/${selectedSystem}/{concept_id}/detail/`}</code>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-sm mb-1">Parameters</h4>
-                  <ul className="text-sm space-y-2">
-                    <li><span className="font-medium">concept_id</span> - Primary key ID of the concept</li>
-                    <li><span className="font-medium">min_confidence</span> - Filter mappings by minimum confidence score (0.0-1.0)</li>
-                    <li><span className="font-medium">validated_only</span> - Show only expert-validated mappings</li>
-                    {selectedSystem !== 'icd11' && (
-                      <li><span className="font-medium">include_embeddings</span> - Include 768-dimensional embeddings in response</li>
-                    )}
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div>
-          <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-          
-          {responseData && (
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Concept Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {responseData.concept && (
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium mb-2">Concept Information</h4>
-                      <div className="bg-muted p-3 rounded text-sm">
-                        <p><span className="font-medium">ID:</span> {responseData.concept.id}</p>
-                        <p><span className="font-medium">Code:</span> {responseData.concept.code}</p>
-                        <p><span className="font-medium">English Name:</span> {responseData.concept.english_name}</p>
-                        {responseData.concept.tamil_name && (
-                          <p><span className="font-medium">Tamil Name:</span> {responseData.concept.tamil_name}</p>
-                        )}
-                        {responseData.concept.arabic_name && (
-                          <p><span className="font-medium">Arabic Name:</span> {responseData.concept.arabic_name}</p>
-                        )}
-                        {responseData.concept.definition && (
-                          <p><span className="font-medium">Definition:</span> {responseData.concept.definition}</p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {responseData.mapping_statistics && (
-                      <div>
-                        <h4 className="font-medium mb-2">Mapping Statistics</h4>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-blue-50 p-2 rounded">
-                            <p className="text-sm font-medium">Total Mappings</p>
-                            <p className="text-lg font-bold">{responseData.mapping_statistics.total_mappings}</p>
-                          </div>
-                          <div className="bg-green-50 p-2 rounded">
-                            <p className="text-sm font-medium">Validated</p>
-                            <p className="text-lg font-bold">{responseData.mapping_statistics.validated_mappings}</p>
-                          </div>
-                          <div className="bg-yellow-50 p-2 rounded">
-                            <p className="text-sm font-medium">High Confidence</p>
-                            <p className="text-lg font-bold">{responseData.mapping_statistics.high_confidence_mappings}</p>
-                          </div>
-                          <div className="bg-purple-50 p-2 rounded">
-                            <p className="text-sm font-medium">Avg Confidence</p>
-                            <p className="text-lg font-bold">
-                              {responseData.mapping_statistics.quality_metrics?.average_confidence 
-                                ? (responseData.mapping_statistics.quality_metrics.average_confidence * 100).toFixed(1) + '%'
-                                : 'N/A'
-                              }
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // All Endpoints Page Component
 const AllEndpointsPage = () => {
+  const [expandedEndpoint, setExpandedEndpoint] = useState<string | null>(null);
+
   const endpoints = [
     {
       name: "Ayurveda Search",
@@ -3240,6 +3053,10 @@ const AllEndpointsPage = () => {
     }
   ];
 
+  const toggleEndpoint = (name: string) => {
+    setExpandedEndpoint(expandedEndpoint === name ? null : name);
+  };
+
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
@@ -3249,51 +3066,78 @@ const AllEndpointsPage = () => {
         </p>
       </div>
       
-      <div className="space-y-8">
+      <div className="space-y-4">
         {endpoints.map((endpoint, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle>{endpoint.name}</CardTitle>
-                  <p className="text-muted-foreground">{endpoint.description}</p>
+          <Card key={index} className="overflow-hidden">
+            <div 
+              className="p-6 cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => toggleEndpoint(endpoint.name)}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-start gap-3">
+                    <Badge variant="outline" className="mt-1">{endpoint.method}</Badge>
+                    <div>
+                      <h3 className="font-semibold text-lg">{endpoint.name}</h3>
+                      <p className="text-muted-foreground mt-1">{endpoint.description}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                    <code className="bg-muted px-3 py-1.5 rounded text-sm flex-1 overflow-x-auto">
+                      {API_BASE_URL_DISPLAY}{endpoint.endpoint}
+                    </code>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyToClipboard(API_BASE_URL_DISPLAY + endpoint.endpoint);
+                      }}
+                      className="shrink-0 bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white"
+                    >
+                      <Copy className="h-4 w-4 mr-1" />
+                      Copy
+                    </Button>
+                  </div>
                 </div>
-                <Badge variant="outline">{endpoint.method}</Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleEndpoint(endpoint.name);
+                  }}
+                  className="shrink-0"
+                >
+                  <ChevronRight 
+                    className={`h-4 w-4 transition-transform ${
+                      expandedEndpoint === endpoint.name ? 'rotate-90' : ''
+                    }`} 
+                  />
+                </Button>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-muted p-4 rounded-lg mb-6">
-                <div className="flex justify-between items-center">
-                  <code className="text-sm break-all overflow-x-auto max-w-full">{API_BASE_URL_DISPLAY}{endpoint.endpoint}</code>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => copyToClipboard(API_BASE_URL_DISPLAY + endpoint.endpoint)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              
-              <h4 className="font-medium mb-3">Sample Response</h4>
-              <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-white text-sm font-medium">Response</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(JSON.stringify(endpoint.sample, null, 2))}
-                    className="h-8 w-8 p-0 text-white hover:bg-white/10"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-                <pre className="text-sm text-white">
-                  <code>{JSON.stringify(endpoint.sample, null, 2)}</code>
-                </pre>
-              </div>
-            </CardContent>
+            </div>
+            
+            <AnimatePresence>
+              {expandedEndpoint === endpoint.name && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 border-t">
+                    <h4 className="font-medium mb-3">Sample Response</h4>
+                    <ScrollArea className="h-96 w-full rounded-md border">
+                      <pre className="p-4 text-sm bg-[#1E1E1E] text-white">
+                        <code>{JSON.stringify(endpoint.sample, null, 2)}</code>
+                      </pre>
+                    </ScrollArea>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         ))}
       </div>
@@ -3367,7 +3211,7 @@ const AnalyticsPage = () => {
     return (
       <div className="px-4 py-8 max-w-6xl mx-auto">
         <div className="flex items-center justify-center p-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1e88e5]"></div>
           <span className="ml-2">Loading analytics data...</span>
         </div>
       </div>
@@ -3401,7 +3245,7 @@ const AnalyticsPage = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <BarChart3 className="h-5 w-5 mr-2 text-blue-500" />
+              <BarChart3 className="h-5 w-5 mr-2 text-[#1e88e5]" />
               Mapping Statistics
             </CardTitle>
           </CardHeader>
@@ -3418,7 +3262,7 @@ const AnalyticsPage = () => {
                   <div className="flex items-center gap-2">
                     <div className="w-32 bg-muted rounded-full h-2.5">
                       <div 
-                        className="bg-blue-500 h-2.5 rounded-full" 
+                        className="bg-[#1e88e5] h-2.5 rounded-full" 
                         style={{ width: `${(count / stats.total_mappings) * 100}%` }}
                       ></div>
                     </div>
@@ -3433,7 +3277,7 @@ const AnalyticsPage = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <PieChart className="h-5 w-5 mr-2 text-green-500" />
+              <PieChart className="h-5 w-5 mr-2 text-[#1e88e5]" />
               Confidence Distribution
             </CardTitle>
           </CardHeader>
@@ -3445,7 +3289,7 @@ const AnalyticsPage = () => {
                   <div className="flex items-center gap-2">
                     <div className="w-32 bg-muted rounded-full h-2.5">
                       <div 
-                        className="bg-green-500 h-2.5 rounded-full" 
+                        className="bg-[#1e88e5] h-2.5 rounded-full" 
                         style={{ width: `${(count / stats.total_mappings) * 100}%` }}
                       ></div>
                     </div>
@@ -3552,28 +3396,28 @@ const HomePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <Card>
                 <CardContent className="p-4 text-center">
-                  <Database className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                  <Database className="h-8 w-8 mx-auto mb-2 text-[#1e88e5]" />
                   <h3 className="font-semibold mb-1">FHIR R4</h3>
                   <p className="text-sm text-muted-foreground">Compliant</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <FileText className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                  <FileText className="h-8 w-8 mx-auto mb-2 text-[#1e88e5]" />
                   <h3 className="font-semibold mb-1">OAuth 2.0</h3>
                   <p className="text-sm text-muted-foreground">ABHA Ready</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <Code className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                  <Code className="h-8 w-8 mx-auto mb-2 text-[#1e88e5]" />
                   <h3 className="font-semibold mb-1">Dual Coding</h3>
                   <p className="text-sm text-muted-foreground">TM + Biomedicine</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <CheckCircle className="h-8 w-8 mx-auto mb-2 text-orange-500" />
+                  <CheckCircle className="h-8 w-8 mx-auto mb-2 text-[#1e88e5]" />
                   <h3 className="font-semibold mb-1">EHR 2016</h3>
                   <p className="text-sm text-muted-foreground">Standards</p>
                 </CardContent>
@@ -3595,7 +3439,7 @@ const HomePage = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Database className="h-5 w-5 mr-2 text-blue-500" />
+                  <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                   Ayurveda API
                 </CardTitle>
               </CardHeader>
@@ -3606,7 +3450,7 @@ const HomePage = () => {
                 <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/ayurveda/search/?q=query</code>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
                   <Link to="/ayurveda">Explore Ayurveda API</Link>
                 </Button>
               </CardContent>
@@ -3615,7 +3459,7 @@ const HomePage = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Database className="h-5 w-5 mr-2 text-purple-500" />
+                  <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                   Siddha API 
                 </CardTitle>
               </CardHeader>
@@ -3626,7 +3470,7 @@ const HomePage = () => {
                 <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/siddha/search/?q=query</code>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
                   <Link to="/siddha">Explore Siddha API</Link>
                 </Button>
               </CardContent>
@@ -3635,7 +3479,7 @@ const HomePage = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Database className="h-5 w-5 mr-2 text-green-500" />
+                  <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                   Unani API
                 </CardTitle>
               </CardHeader>
@@ -3646,7 +3490,7 @@ const HomePage = () => {
                 <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/unani/search/?q=query</code>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
                   <Link to="/unani">Explore Unani API</Link>
                 </Button>
               </CardContent>
@@ -3655,7 +3499,7 @@ const HomePage = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Database className="h-5 w-5 mr-2 text-orange-500" />
+                  <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
                   ICD-11 API
                 </CardTitle>
               </CardHeader>
@@ -3666,7 +3510,7 @@ const HomePage = () => {
                 <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/icd11/search/?q=query</code>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
                   <Link to="/icd11">Explore ICD-11 API</Link>
                 </Button>
               </CardContent>
@@ -3675,7 +3519,7 @@ const HomePage = () => {
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Map className="h-5 w-5 mr-2 text-red-500" />
+                  <Map className="h-5 w-5 mr-2 text-[#1e88e5]" />
                   Mappings API
                 </CardTitle>
               </CardHeader>
@@ -3686,36 +3530,35 @@ const HomePage = () => {
                 <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=query</code>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
                   <Link to="/mappings-testing">Explore Mappings API</Link>
                 </Button>
               </CardContent>
             </Card>
             <Card>
-  <CardHeader>
-    <CardTitle className="flex items-center">
-      <Heart className="h-5 w-5 mr-2 text-red-500" />
-      FHIR R4 API
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <p className="text-muted-foreground mb-4">
-      Fully FHIR R4 compliant API with ABHA integration and dual coding support.
-    </p>
-    <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
-      <code>GET {API_BASE_URL_DISPLAY}/fhir/Condition?code=diabetes</code>
-    </div>
-    <Button asChild variant="outline">
-      <Link to="/fhir">Explore FHIR API</Link>
-    </Button>
-  </CardContent>
-</Card>
-
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Heart className="h-5 w-5 mr-2 text-[#1e88e5]" />
+                  FHIR R4 API
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Fully FHIR R4 compliant API with ABHA integration and dual coding support.
+                </p>
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
+                  <code>GET {API_BASE_URL_DISPLAY}/fhir/Condition?code=diabetes</code>
+                </div>
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
+                  <Link to="/fhir">Explore FHIR API</Link>
+                </Button>
+              </CardContent>
+            </Card>
 
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Upload className="h-5 w-5 mr-2 text-yellow-500" />
+                  <Upload className="h-5 w-5 mr-2 text-[#1e88e5]" />
                   Upload CSV API
                 </CardTitle>
               </CardHeader>
@@ -3726,7 +3569,7 @@ const HomePage = () => {
                 <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>POST {API_BASE_URL_DISPLAY}/terminologies/{`{system}`}/csv/upload/</code>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
                   <Link to="/upload">Explore Upload API</Link>
                 </Button>
               </CardContent>
@@ -3735,7 +3578,7 @@ const HomePage = () => {
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Zap className="h-5 w-5 mr-2 text-indigo-500" />
+                  <Zap className="h-5 w-5 mr-2 text-[#1e88e5]" />
                   Combined Search API
                 </CardTitle>
               </CardHeader>
@@ -3746,7 +3589,7 @@ const HomePage = () => {
                 <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=query</code>
                 </div>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white">
                   <Link to="/mappings-testing">Explore Combined Search</Link>
                 </Button>
               </CardContent>
@@ -4071,92 +3914,90 @@ const FHIRPage = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Heart className="h-5 w-5 mr-2 text-red-500" />
+                <Heart className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 FHIR Resource Explorer
               </CardTitle>
               <p className="text-muted-foreground">
                 Explore FHIR R4 resources with integrated traditional medicine coding
               </p>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">FHIR Resource</label>
+                <Select value={selectedResource} onValueChange={setSelectedResource}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select FHIR resource" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {fhirResources.map((resource) => (
+                      <SelectItem key={resource.value} value={resource.value}>
+                        {resource.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {fhirResources.find(r => r.value === selectedResource)?.description}
+                </p>
+              </div>
+              
+              {selectedResource === "Condition" && (
                 <div>
-                  <label className="text-sm font-medium mb-2 block">FHIR Resource</label>
-                  <Select value={selectedResource} onValueChange={setSelectedResource}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select FHIR resource" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fhirResources.map((resource) => (
-                        <SelectItem key={resource.value} value={resource.value}>
-                          {resource.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <label className="text-sm font-medium mb-2 block">Condition Code</label>
+                  <Input
+                    placeholder="Enter condition code (e.g., EC-3.19, fever)"
+                    value={conditionCode}
+                    onChange={(e) => setConditionCode(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
+                  />
                   <p className="text-xs text-muted-foreground mt-1">
-                    {fhirResources.find(r => r.value === selectedResource)?.description}
+                    Enter NAMASTE Ayurveda code or condition name
                   </p>
                 </div>
-                
-                {selectedResource === "Condition" && (
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Condition Code</label>
-                    <Input
-                      placeholder="Enter condition code (e.g., EC-3.19, fever)"
-                      value={conditionCode}
-                      onChange={(e) => setConditionCode(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Enter NAMASTE Ayurveda code or condition name
-                    </p>
-                  </div>
+              )}
+              
+              {selectedResource === "Patient" && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Patient ID</label>
+                  <Input
+                    placeholder="Enter ABHA number or patient ID"
+                    value={patientId}
+                    onChange={(e) => setPatientId(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ABHA format: 12-3456-7890-1234
+                  </p>
+                </div>
+              )}
+              
+              <Button onClick={handleFHIRSearch} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Pushing to FHIR Server...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    Push to FHIR Server
+                  </>
                 )}
-                
-                {selectedResource === "Patient" && (
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Patient ID</label>
-                    <Input
-                      placeholder="Enter ABHA number or patient ID"
-                      value={patientId}
-                      onChange={(e) => setPatientId(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      ABHA format: 12-3456-7890-1234
-                    </p>
-                  </div>
-                )}
-                
-                <Button onClick={handleFHIRSearch} disabled={loading} className="w-full">
-                  {loading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Pushing to FHIR Server...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Push to FHIR Server
-                    </>
-                  )}
-                </Button>
+              </Button>
 
-                {searchPerformed && !loading && responseData && (
-                  <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-                    <div className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                      <span className="text-green-800 dark:text-green-200 font-medium">
-                        ✅ 200 OK - Successfully Pushed to FHIR Server
-                      </span>
-                    </div>
-                    <p className="text-green-700 dark:text-green-300 text-sm mt-1">
-                      FHIR {selectedResource} resource created with dual coding support
-                    </p>
+              {searchPerformed && !loading && responseData && (
+                <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    <span className="text-green-800 dark:text-green-200 font-medium">
+                      ✅ 200 OK - Successfully Pushed to FHIR Server
+                    </span>
                   </div>
-                )}
-              </div>
+                  <p className="text-green-700 dark:text-green-300 text-sm mt-1">
+                    FHIR {selectedResource} resource created with dual coding support
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
           
@@ -4168,12 +4009,12 @@ const FHIRPage = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                    <Shield className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                    <Shield className="h-8 w-8 mx-auto mb-2 text-[#1e88e5]" />
                     <div className="text-sm font-medium text-blue-900 dark:text-blue-100">FHIR Version</div>
                     <div className="text-lg font-bold text-blue-700 dark:text-blue-300">R4</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
-                    <Users className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                    <Users className="h-8 w-8 mx-auto mb-2 text-[#1e88e5]" />
                     <div className="text-sm font-medium text-green-900 dark:text-green-100">ABHA Ready</div>
                     <div className="text-lg font-bold text-green-700 dark:text-green-300">Yes</div>
                   </div>
@@ -4218,19 +4059,19 @@ const FHIRPage = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                <FileText className="h-5 w-5 mr-2 text-[#1e88e5]" />
                 FHIR Endpoints
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {fhirResources.map((resource) => (
-                  <div key={resource.value} className="flex justify-between items-start p-3 bg-muted rounded-lg">
+                  <div key={resource.value} className="flex flex-col sm:flex-row sm:justify-between sm:items-start p-3 bg-muted rounded-lg gap-2">
                     <div className="flex-1">
                       <span className="font-medium block">{resource.label}</span>
                       <p className="text-xs text-muted-foreground mt-1">{resource.description}</p>
                     </div>
-                    <code className="text-xs bg-muted-foreground/10 px-2 py-1 rounded ml-2 flex-shrink-0">
+                    <code className="text-xs bg-muted-foreground/10 px-2 py-1 rounded flex-shrink-0">
                       POST {resource.endpoint}
                     </code>
                   </div>
@@ -4260,7 +4101,7 @@ const FHIRPage = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Status:</span>
                       <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
@@ -4283,7 +4124,7 @@ const FHIRPage = () => {
 
                   {responseData.dualCoding && (
                     <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-3 text-blue-600">Dual Coding Applied</h4>
+                      <h4 className="font-medium mb-3 text-[#1e88e5]">Dual Coding Applied</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded">
                           <h5 className="font-medium text-sm mb-2 text-blue-700 dark:text-blue-300">Traditional Medicine (NAMASTE)</h5>
@@ -4329,11 +4170,11 @@ const FHIRPage = () => {
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
-                  <pre className="text-sm text-white">
+                <ScrollArea className="h-96 w-full rounded-md border">
+                  <pre className="p-4 text-sm bg-[#1E1E1E] text-white">
                     <code>{JSON.stringify(generateFHIRResource(), null, 2)}</code>
                   </pre>
-                </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           )}
@@ -4356,7 +4197,7 @@ const FHIRPage = () => {
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-md flex items-center">
-                        <Database className="h-4 w-4 mr-2 text-blue-500" />
+                        <Database className="h-4 w-4 mr-2 text-[#1e88e5]" />
                         NAMASTE Codes
                       </CardTitle>
                     </CardHeader>
@@ -4381,7 +4222,7 @@ const FHIRPage = () => {
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-md flex items-center">
-                        <Globe className="h-4 w-4 mr-2 text-green-500" />
+                        <Globe className="h-4 w-4 mr-2 text-[#1e88e5]" />
                         ICD-11 TM2
                       </CardTitle>
                     </CardHeader>
@@ -4411,6 +4252,7 @@ const FHIRPage = () => {
     </div>
   );
 };
+
 // Main App Component
 function App() {
   const { theme, setTheme } = useTheme();
@@ -4434,7 +4276,6 @@ function App() {
             <Route path="/autocomplete" element={<AutocompletePage />} />
             <Route path="/all-endpoints" element={<AllEndpointsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/mappings" element={<MappingsPage />} />
             <Route path="/fhir" element={<FHIRPage />} />
           </Routes>
         </div>
