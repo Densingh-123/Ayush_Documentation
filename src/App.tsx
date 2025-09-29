@@ -59,7 +59,8 @@ import {
   User,
   Upload,
   Zap,
-  Menu
+  Menu,
+  Map
 } from "lucide-react";
 
 // Theme Context
@@ -72,7 +73,7 @@ const ThemeContext = createContext({
 const useThemeContext = () => useContext(ThemeContext);
 
 // API base URL
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://ayushbandan.duckdns.org";
 const API_BASE_URL_DISPLAY = "{{base_url}}";
 
 // Animation variants
@@ -121,12 +122,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       icon: <Database className="h-4 w-4" />
     },
     {
-      title: "Mappings & Testing",
+      title: "Cocept Mapping",
       href: "/mappings-testing",
       icon: <Code className="h-4 w-4" />
     },
     {
-      title: "Upload CSV",
+      title: "Upload-CSV API",
       href: "/upload",
       icon: <Upload className="h-4 w-4" />
     },
@@ -144,7 +145,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       title: "Analytics",
       href: "/analytics",
       icon: <BarChart3 className="h-4 w-4" />
-    }
+    },
+    // {
+    //   title: "Mappings Details",
+    //   href: "/mappings",
+    //   icon: <Map className="h-4 w-4" />
+    // }
   ];
 
   return (
@@ -312,7 +318,7 @@ const Sidebar = () => {
       icon: <Database className="h-4 w-4" />
     },
     {
-      title: "Mappings & Testing",
+      title: "Concept Mapping",
       href: "/mappings-testing",
       icon: <Code className="h-4 w-4" />
     },
@@ -335,7 +341,12 @@ const Sidebar = () => {
       title: "Analytics",
       href: "/analytics",
       icon: <BarChart3 className="h-4 w-4" />
-    }
+    },
+    // {
+    //   title: "Mappings Details",
+    //   href: "/mappings",
+    //   icon: <Map className="h-4 w-4" />
+    // }
   ];
 
   return (
@@ -473,6 +484,16 @@ const AIChatbot = () => {
         if (item.source_term && item.icd_mapping) {
           response += `Term: ${item.source_term.english_name || 'N/A'} (${item.source_term.code || 'N/A'}) → ICD-11: ${item.icd_mapping.code || 'N/A'} (${item.icd_mapping.title || 'N/A'}), Confidence: ${(item.confidence_score * 100).toFixed(1)}%\n`;
         }
+      } else if (system === 'combined') {
+        response += `ICD-11: ${item.code || 'N/A'} - ${item.title || 'N/A'}\n`;
+        if (item.related_ayurveda || item.related_siddha || item.related_unani) {
+          response += `  Mappings: `;
+          const mappings = [];
+          if (item.related_ayurveda) mappings.push(`Ayurveda: ${item.related_ayurveda.english_name}`);
+          if (item.related_siddha) mappings.push(`Siddha: ${item.related_siddha.english_name}`);
+          if (item.related_unani) mappings.push(`Unani: ${item.related_unani.english_name}`);
+          response += mappings.join(', ') + '\n';
+        }
       }
     });
 
@@ -545,6 +566,10 @@ const AIChatbot = () => {
       
       const query = inputValue.replace(/mapping|map|siddha|unani|ayurveda/gi, '').trim() || 'fever';
       apiUrl = `${API_BASE_URL}/terminologies/mappings/?system=${medicalSystem}&q=${encodeURIComponent(query)}&min_confidence=0.1`;
+    } else if (lowercaseInput.includes('combined') || lowercaseInput.includes('all') || lowercaseInput.includes('search')) {
+      system = 'combined';
+      const query = inputValue.replace(/combined|all|search/gi, '').trim() || 'disease';
+      apiUrl = `${API_BASE_URL}/terminologies/search/combined/?q=${encodeURIComponent(query)}&fuzzy=true&use_fts=true&threshold=0.2`;
     } else if (context.lastSystem) {
       // Use context if no specific system mentioned
       system = context.lastSystem;
@@ -628,6 +653,10 @@ const AIChatbot = () => {
     
     if (lowercaseInput.includes("mapping") || lowercaseInput.includes("map")) {
       return "The Mappings API finds connections between traditional medicine terminologies and ICD-11 codes. Use the endpoint: GET /terminologies/mappings/?system=system&q=query&min_confidence=0.1. Responses include confidence scores and matched terms.";
+    }
+    
+    if (lowercaseInput.includes("combined") || lowercaseInput.includes("all systems")) {
+      return "The Combined Search API searches across all ICD-11 terms and their related NAMASTE concepts. Use the endpoint: GET /terminologies/search/combined/?q=query&fuzzy=true&use_fts=true. It returns ICD-11 terms with their related Ayurveda, Siddha, and Unani mappings.";
     }
     
     // Search parameters
@@ -912,25 +941,33 @@ const HeroSection = () => {
     triggerOnce: true,
   });
 
-  const [counts, setCounts] = useState({
-    ayurveda: 4500,
-    siddha: 1200,
-    unani: 1800,
-    icd11: 529,
+  const [stats, setStats] = useState({
+    total_mappings: 0,
+    by_system: {
+      ayurveda: 0,
+      siddha: 0,
+      unani: 0
+    },
+    confidence_distribution: {
+      high_confidence: 0,
+      medium_confidence: 0,
+      low_confidence: 0
+    }
   });
 
   const [displayCounts, setDisplayCounts] = useState({
-    ayurveda: 1,
-    siddha: 1,
-    unani: 1,
-    icd11: 1,
+    ayurveda: 0,
+    siddha: 0,
+    unani: 0,
+    total_mappings: 0
   });
 
   // Function to animate counts
   const animateCount = (key, target) => {
-    let current = 1;
+    let current = 0;
+    const increment = Math.max(1, Math.ceil(target / 100));
     const interval = setInterval(() => {
-      current += Math.ceil(target / 100);
+      current += increment;
       if (current >= target) {
         current = target;
         clearInterval(interval);
@@ -939,43 +976,48 @@ const HeroSection = () => {
     }, 20);
   };
 
-  // Fetch data on mount
+  // Fetch real-time stats on mount
   useEffect(() => {
-    const fetchCounts = async () => {
+    const fetchStats = async () => {
       try {
-        const responses = await Promise.all([
-          fetch("http://localhost:8000/terminologies/ayurveda/search/?q=diseane"),
-          fetch("http://localhost:8000/terminologies/siddha/search/?q=diseane"),
-          fetch("http://localhost:8000/terminologies/unani/search/?q=diseane"),
-          fetch(
-            "http://localhost:8000/terminologies/icd11/search/?q=Diabet&fuzzy=true&threshold=0.3"
-          ),
-        ]);
+        const response = await fetch(`${API_BASE_URL}/terminologies/mappings/stats/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setStats(data);
 
-        const data = await Promise.all(responses.map((res) => res.json()));
-
-        const newCounts = {
-          ayurveda: data[0]?.length || 4500,
-          siddha: data[1]?.length || 1200,
-          unani: data[2]?.length || 1800,
-          icd11: data[3]?.length || 529,
-        };
-
-        setCounts(newCounts);
-
-        Object.keys(newCounts).forEach((key) => {
-          animateCount(key, newCounts[key]);
-        });
+        // Animate the counts
+        animateCount('total_mappings', data.total_mappings);
+        animateCount('ayurveda', data.by_system.ayurveda);
+        animateCount('siddha', data.by_system.siddha);
+        animateCount('unani', data.by_system.unani);
       } catch (error) {
-        console.error("Error fetching counts, using fallback:", error);
-
-        Object.keys(counts).forEach((key) => {
-          animateCount(key, counts[key]);
-        });
+        console.error("Error fetching stats, using fallback:", error);
+        // Fallback data
+        const fallbackData = {
+          total_mappings: 2399,
+          by_system: {
+            ayurveda: 787,
+            siddha: 490,
+            unani: 1122
+          },
+          confidence_distribution: {
+            high_confidence: 437,
+            medium_confidence: 976,
+            low_confidence: 986
+          }
+        };
+        setStats(fallbackData);
+        
+        animateCount('total_mappings', fallbackData.total_mappings);
+        animateCount('ayurveda', fallbackData.by_system.ayurveda);
+        animateCount('siddha', fallbackData.by_system.siddha);
+        animateCount('unani', fallbackData.by_system.unani);
       }
     };
 
-    fetchCounts();
+    fetchStats();
   }, []);
 
   return (
@@ -1023,9 +1065,11 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex items-center justify-center gap-4 mb-12 flex-wrap"
           >
-            <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
-              Get Started
-            </Button>
+         <Link to="/all-endpoints">
+  <Button size="lg" className="bg-blue-500 hover:bg-blue-600">
+    Get Started
+  </Button>
+</Link>
             <Link to="/all-endpoints">
               <Button variant="outline" size="lg">
                 View API Reference
@@ -1043,34 +1087,34 @@ const HeroSection = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                   <div>
                     <div className="text-2xl font-bold mb-2">
-                      {displayCounts.ayurveda}+
+                      {displayCounts.ayurveda}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Ayurveda Terms
+                      Ayurveda Mappings
                     </div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold mb-2">
-                      {displayCounts.siddha}+
+                      {displayCounts.siddha}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Siddha Terms
+                      Siddha Mappings
                     </div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold mb-2">
-                      {displayCounts.unani}+
+                      {displayCounts.unani}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Unani Terms
+                      Unani Mappings
                     </div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold mb-2">
-                      {displayCounts.icd11}
+                      {displayCounts.total_mappings}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      ICD-11 TM2 Codes
+                      Total Mappings
                     </div>
                   </div>
                 </div>
@@ -1211,7 +1255,7 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
             <div className="bg-muted rounded-lg p-4 text-sm">
               <div className="flex items-center mb-2">
                 <span className="font-medium mr-2">URL:</span>
-                <code className="bg-muted-foreground/10 px-2 py-1 rounded">
+                <code className="bg-muted-foreground/10 px-2 py-1 rounded overflow-x-auto max-w-full">
                   {API_BASE_URL_DISPLAY}{endpoint}{query}
                 </code>
                 <Button 
@@ -1219,6 +1263,154 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
                   size="sm" 
                   className="ml-2 h-8 w-8 p-0"
                   onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}${endpoint}${query}`)}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex items-center">
+                <span className="font-medium mr-2">Method:</span>
+                <Badge variant="outline">GET</Badge>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Combined Search Component
+const CombinedSearchComponent = () => {
+  const [query, setQuery] = useState("diabetes");
+  const [fuzzy, setFuzzy] = useState(true);
+  const [useFts, setUseFts] = useState(true);
+  const [threshold, setThreshold] = useState(0.2);
+  const [pageSize, setPageSize] = useState(10);
+  const [responseData, setResponseData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const url = `${API_BASE_URL}/terminologies/search/combined/?q=${encodeURIComponent(query)}&fuzzy=${fuzzy}&use_fts=${useFts}&threshold=${threshold}&page_size=${pageSize}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle>Combined Search</CardTitle>
+        <p className="text-muted-foreground">
+          Search across all ICD-11 terms and their related NAMASTE concepts in one API call.
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Search Query</label>
+            <Input
+              placeholder="Enter search term..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Page Size</label>
+            <Input
+              type="number"
+              min="1"
+              max="50"
+              value={pageSize}
+              onChange={(e) => setPageSize(parseInt(e.target.value) || 10)}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Similarity Threshold</label>
+            <Input
+              type="number"
+              step="0.1"
+              min="0.0"
+              max="1.0"
+              value={threshold}
+              onChange={(e) => setThreshold(parseFloat(e.target.value))}
+            />
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="fuzzy"
+                checked={fuzzy}
+                onChange={(e) => setFuzzy(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <label htmlFor="fuzzy" className="text-sm font-medium">
+                Fuzzy Search
+              </label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="fts"
+                checked={useFts}
+                onChange={(e) => setUseFts(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <label htmlFor="fts" className="text-sm font-medium">
+                Full-Text Search
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <Button onClick={handleSearch} disabled={loading} className="w-full">
+          {loading ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+          ) : (
+            <Search className="h-4 w-4 mr-2" />
+          )}
+          Combined Search
+        </Button>
+        
+        <ApiResponseDisplay data={responseData} loading={loading} error={error} />
+        
+        {responseData && (
+          <div className="mt-6">
+            <h4 className="font-medium mb-3">Endpoint Information</h4>
+            <div className="bg-muted rounded-lg p-4 text-sm">
+              <div className="flex items-center mb-2">
+                <span className="font-medium mr-2">URL:</span>
+                <code className="bg-muted-foreground/10 px-2 py-1 rounded overflow-x-auto max-w-full">
+                  {API_BASE_URL_DISPLAY}/terminologies/search/combined/?q={query}&fuzzy={fuzzy}&use_fts={useFts}&threshold={threshold}&page_size={pageSize}
+                </code>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="ml-2 h-8 w-8 p-0"
+                  onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${query}&fuzzy=${fuzzy}&use_fts=${useFts}&threshold=${threshold}&page_size=${pageSize}`)}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -1382,7 +1574,7 @@ const UploadPage = () => {
                 
                 <div>
                   <h4 className="font-medium text-sm mb-1">URL</h4>
-                  <div className="bg-muted p-2 rounded text-sm">
+                  <div className="bg-muted p-2 rounded text-sm overflow-x-auto">
                     <code>{`${API_BASE_URL_DISPLAY}/terminologies/{system}/csv/upload/`}</code>
                   </div>
                 </div>
@@ -1597,7 +1789,7 @@ const AutocompletePage = () => {
                 
                 <div>
                   <h4 className="font-medium text-sm mb-1">URL</h4>
-                  <div className="bg-muted p-2 rounded text-sm">
+                  <div className="bg-muted p-2 rounded text-sm overflow-x-auto">
                     <code>{`${API_BASE_URL_DISPLAY}/terminologies/{system}/autocomplete/`}</code>
                   </div>
                 </div>
@@ -1676,7 +1868,7 @@ const AyurvedaPage = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm">
+                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
                     <code>
                       {`{
   "count": 283,
@@ -1814,7 +2006,7 @@ const SiddhaPage = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm">
+                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
                     <code>
                       {`{
   "count": 138,
@@ -1952,7 +2144,7 @@ const UnaniPage = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm">
+                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
                     <code>
                       {`{
   "count": 139,
@@ -2091,7 +2283,7 @@ const ICD11Page = () => {
               <div className="space-y-3">
                 <div>
                   <h4 className="font-medium text-sm mb-1">Success Response</h4>
-                  <div className="bg-muted p-3 rounded text-sm">
+                  <div className="bg-muted p-3 rounded text-sm overflow-x-auto">
                     <code>
                       {`{
   "count": 6,
@@ -2243,6 +2435,8 @@ const MappingsTestingPage = () => {
       
       if (selectedEndpoint === "mappings") {
         url = `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${testQuery || "fever"}&min_confidence=0.1`;
+      } else if (selectedEndpoint === "combined") {
+        url = `${API_BASE_URL}/terminologies/search/combined/?q=${testQuery || "diabetes"}&fuzzy=true&use_fts=true&threshold=0.2`;
       } else {
         const endpoints = {
           ayurveda: `${API_BASE_URL}/terminologies/ayurveda/search/?q=`,
@@ -2272,154 +2466,121 @@ const MappingsTestingPage = () => {
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">Mappings & Testing API</h2>
+        <h2 className="text-3xl font-bold mb-4">Concept Mapping</h2>
         <p className="text-muted-foreground">
           Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores, and test all API endpoints.
         </p>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Search Mappings</CardTitle>
-              <p className="text-muted-foreground">Find mappings between traditional medicine systems and ICD-11</p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">System</label>
-                  <Select value={system} onValueChange={setSystem}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select system" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ayurveda">Ayurveda</SelectItem>
-                      <SelectItem value="siddha">Siddha</SelectItem>
-                      <SelectItem value="unani">Unani</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Search Query</label>
-                  <Input
-                    placeholder="Enter search term..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Min Confidence</label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0.1"
-                    max="1.0"
-                    value={minConfidence}
-                    onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
-                  />
-                </div>
-              </div>
-              
-              <Button onClick={handleSearch} disabled={loading}>
-                {loading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                ) : (
-                  <Search className="h-4 w-4 mr-2" />
-                )}
-                Search Mappings
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        
-       <div>
-  <Card className="mb-8 w-full">
-    <CardHeader>
-      <CardTitle>Test Endpoints</CardTitle>
-      <p className="text-muted-foreground">
-        Select an endpoint and enter parameters to test
-      </p>
-    </CardHeader>
-    <CardContent>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Select Endpoint</label>
-          <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select endpoint" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
-              <SelectItem value="siddha">Siddha Search</SelectItem>
-              <SelectItem value="unani">Unani Search</SelectItem>
-              <SelectItem value="icd11">ICD-11 Search</SelectItem>
-              <SelectItem value="mappings">Mappings</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <Tabs defaultValue="mappings" className="mb-8">
+  <TabsList className="grid w-full grid-cols-2">
+    <TabsTrigger value="mappings">Combined Search</TabsTrigger>
+    <TabsTrigger value="testing">Endpoint Testing</TabsTrigger>
+  </TabsList>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {selectedEndpoint === "mappings"
-              ? "Search Query (optional)"
-              : "Search Query"}
-          </label>
-          <Input
-            placeholder={
-              selectedEndpoint === "mappings"
-                ? "Enter search term (default: fever)"
-                : "Enter search term"
-            }
-            value={testQuery}
-            onChange={(e) => setTestQuery(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleTest()}
-          />
-        </div>
-      </div>
+  {/* First Tab: Only Combined Search (Full Width) */}
+  <TabsContent value="mappings">
+    <div className="w-full">
+      <Card className="mb-8 w-full">
+        <CardHeader>
+          <CardTitle>Combined Search</CardTitle>
+          <p className="text-muted-foreground">
+            Search across all ICD-11 terms and their related NAMASTE concepts
+          </p>
+        </CardHeader>
+        <CardContent>
+          <CombinedSearchComponent />
+        </CardContent>
+      </Card>
+    </div>
+  </TabsContent>
 
-      <div className="flex flex-col md:flex-row md:items-center gap-4">
-        <Button onClick={handleTest} disabled={loading} className="md:w-auto w-full">
-          {loading ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-          ) : (
-            <Code className="h-4 w-4 mr-2" />
-          )}
-          Test Endpoint
-        </Button>
+  {/* Second Tab: Endpoint Testing */}
+  <TabsContent value="testing">
+    <div className="w-full">
+      <Card className="mb-8 w-full">
+        <CardHeader>
+          <CardTitle>Test Endpoints</CardTitle>
+          <p className="text-muted-foreground">
+            Select an endpoint and enter parameters to test
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Select Endpoint</label>
+              <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select endpoint" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ayurveda">Ayurveda Search</SelectItem>
+                  <SelectItem value="siddha">Siddha Search</SelectItem>
+                  <SelectItem value="unani">Unani Search</SelectItem>
+                  <SelectItem value="icd11">ICD-11 Search</SelectItem>
+                  <SelectItem value="combined">Combined Search</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* Click to copy endpoint */}
-        <div
-          className="text-sm text-muted-foreground cursor-pointer flex-1"
-          onClick={() =>
-            navigator.clipboard.writeText(
-              selectedEndpoint === "mappings"
-                ? `${API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=${
-                    testQuery || "fever"
-                  }&min_confidence=0.1`
-                : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
-            )
-          }
-          title="Click to copy"
-        >
-          Endpoint:{" "}
-          <code className="bg-muted px-2 py-1 rounded break-all">
-            {selectedEndpoint === "mappings"
-              ? `${API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=${
-                  testQuery || "fever"
-                }&min_confidence=0.1`
-              : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
-          </code>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-</div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {selectedEndpoint === "combined"
+                  ? "Search Query (optional)"
+                  : "Search Query"}
+              </label>
+              <Input
+                placeholder={
+                  selectedEndpoint === "combined"
+                    ? "Enter search term (default: diabetes)"
+                    : "Enter search term"
+                }
+                value={testQuery}
+                onChange={(e) => setTestQuery(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleTest()}
+              />
+            </div>
+          </div>
 
-      </div>
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <Button onClick={handleTest} disabled={loading} className="md:w-auto w-full">
+              {loading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              ) : (
+                <Code className="h-4 w-4 mr-2" />
+              )}
+              Test Endpoint
+            </Button>
+
+            <div
+              className="text-sm text-muted-foreground cursor-pointer flex-1"
+              onClick={() =>
+                navigator.clipboard.writeText(
+                  selectedEndpoint === "combined"
+                    ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
+                        testQuery || "diabetes"
+                      }&fuzzy=true&use_fts=true&threshold=0.2`
+                    : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
+                )
+              }
+              title="Click to copy"
+            >
+              Endpoint:{" "}
+              <code className="bg-muted px-2 py-1 rounded break-all overflow-x-auto max-w-full">
+                {selectedEndpoint === "combined"
+                  ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
+                      testQuery || "diabetes"
+                    }&fuzzy=true&use_fts=true&threshold=0.2`
+                  : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
+              </code>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  </TabsContent>
+</Tabs>
+
       
       <ApiResponseDisplay data={responseData} loading={loading} error={error} />
       
@@ -2431,49 +2592,331 @@ const MappingsTestingPage = () => {
             {responseData.results.map((mapping, index) => (
               <Card key={index}>
                 <CardHeader>
-                  <CardTitle className="text-lg">{mapping.source_term.english_name}</CardTitle>
+                  <CardTitle className="text-lg">{mapping.source_term?.english_name || mapping.title}</CardTitle>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">{mapping.source_term.code}</Badge>
-                    <Badge variant="secondary">Confidence: {(mapping.confidence_score * 100).toFixed(1)}%</Badge>
+                    <Badge variant="outline">{mapping.source_term?.code || mapping.code}</Badge>
+                    {mapping.confidence_score && (
+                      <Badge variant="secondary">Confidence: {(mapping.confidence_score * 100).toFixed(1)}%</Badge>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-medium mb-2">Source Term</h4>
-                      <div className="bg-muted p-3 rounded text-sm">
-                        <p><span className="font-medium">Code:</span> {mapping.source_term.code}</p>
-                        <p><span className="font-medium">Name:</span> {mapping.source_term.english_name}</p>
-                        {mapping.source_term.hindi_name && (
-                          <p><span className="font-medium">Hindi:</span> {mapping.source_term.hindi_name}</p>
-                        )}
-                        {mapping.source_term.diacritical_name && (
-                          <p><span className="font-medium">Diacritical:</span> {mapping.source_term.diacritical_name}</p>
+                  {mapping.source_term ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="font-medium mb-2">Source Term</h4>
+                        <div className="bg-muted p-3 rounded text-sm">
+                          <p><span className="font-medium">Code:</span> {mapping.source_term.code}</p>
+                          <p><span className="font-medium">Name:</span> {mapping.source_term.english_name}</p>
+                          {mapping.source_term.hindi_name && (
+                            <p><span className="font-medium">Hindi:</span> {mapping.source_term.hindi_name}</p>
+                          )}
+                          {mapping.source_term.diacritical_name && (
+                            <p><span className="font-medium">Diacritical:</span> {mapping.source_term.diacritical_name}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2">ICD-11 Mapping</h4>
+                        {mapping.icd_mapping ? (
+                          <div className="bg-muted p-3 rounded text-sm">
+                            <p><span className="font-medium">Code:</span> {mapping.icd_mapping.code}</p>
+                            <p><span className="font-medium">Title:</span> {mapping.icd_mapping.title}</p>
+                            <p><span className="font-medium">Similarity:</span> {(mapping.icd_mapping.similarity_score * 100).toFixed(1)}%</p>
+                          </div>
+                        ) : (
+                          <div className="bg-muted p-3 rounded text-sm">
+                            <p className="text-muted-foreground">No ICD-11 mapping available</p>
+                          </div>
                         )}
                       </div>
                     </div>
-                    
-                    <div>
-                      <h4 className="font-medium mb-2">ICD-11 Mapping</h4>
-                      {mapping.icd_mapping ? (
-                        <div className="bg-muted p-3 rounded text-sm">
-                          <p><span className="font-medium">Code:</span> {mapping.icd_mapping.code}</p>
-                          <p><span className="font-medium">Title:</span> {mapping.icd_mapping.title}</p>
-                          <p><span className="font-medium">Similarity:</span> {(mapping.icd_mapping.similarity_score * 100).toFixed(1)}%</p>
+                  ) : (
+                    <div className="bg-muted p-3 rounded text-sm">
+                      <p><span className="font-medium">Code:</span> {mapping.code}</p>
+                      <p><span className="font-medium">Title:</span> {mapping.title}</p>
+                      {mapping.definition && (
+                        <p><span className="font-medium">Definition:</span> {mapping.definition}</p>
+                      )}
+                      {mapping.related_ayurveda || mapping.related_siddha || mapping.related_unani ? (
+                        <div className="mt-2">
+                          <p className="font-medium">Related NAMASTE Concepts:</p>
+                          <ul className="list-disc list-inside">
+                            {mapping.related_ayurveda && <li>Ayurveda: {mapping.related_ayurveda.english_name}</li>}
+                            {mapping.related_siddha && <li>Siddha: {mapping.related_siddha.english_name}</li>}
+                            {mapping.related_unani && <li>Unani: {mapping.related_unani.english_name}</li>}
+                          </ul>
                         </div>
                       ) : (
-                        <div className="bg-muted p-3 rounded text-sm">
-                          <p className="text-muted-foreground">No ICD-11 mapping available</p>
-                        </div>
+                        <p className="text-muted-foreground">No related NAMASTE concepts found</p>
                       )}
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+// Mappings Details Page Component
+const MappingsPage = () => {
+  const [selectedSystem, setSelectedSystem] = useState("siddha");
+  const [conceptId, setConceptId] = useState("");
+  const [minConfidence, setMinConfidence] = useState(0.5);
+  const [validatedOnly, setValidatedOnly] = useState(false);
+  const [includeEmbeddings, setIncludeEmbeddings] = useState(false);
+  const [responseData, setResponseData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleFetchDetails = async () => {
+    if (!conceptId.trim()) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let url = '';
+      
+      if (selectedSystem === 'siddha') {
+        url = `${API_BASE_URL}/namasthe_mapping/siddha/${conceptId}/detail/?min_confidence=${minConfidence}&validated_only=${validatedOnly}&include_embeddings=${includeEmbeddings}`;
+      } else if (selectedSystem === 'unani') {
+        url = `${API_BASE_URL}/namasthe_mapping/unani/${conceptId}/detail/?min_confidence=${minConfidence}&validated_only=${validatedOnly}&include_embeddings=${includeEmbeddings}`;
+      } else if (selectedSystem === 'icd11') {
+        url = `${API_BASE_URL}/namasthe_mapping/icd11/${conceptId}/detail/?min_confidence=${minConfidence}&validated_only=${validatedOnly}`;
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const systemInfo = {
+    siddha: {
+      description: "Retrieve detailed information for a Siddha concept with all mapped ICD-11 terms",
+      exampleId: "123"
+    },
+    unani: {
+      description: "Retrieve detailed information for an Unani concept with all mapped ICD-11 terms",
+      exampleId: "123"
+    },
+    icd11: {
+      description: "Retrieve detailed information for an ICD-11 concept with all related NAMASTE concepts",
+      exampleId: "123"
+    }
+  };
+
+  return (
+    <div className="px-4 py-8 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold mb-4">Mappings Details API</h2>
+        <p className="text-muted-foreground">
+          Get detailed mapping information for specific concepts with comprehensive statistics and quality metrics.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Fetch Concept Details</CardTitle>
+              <p className="text-muted-foreground">{systemInfo[selectedSystem].description}</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select System</label>
+                  <Select value={selectedSystem} onValueChange={setSelectedSystem}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select system" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="siddha">Siddha</SelectItem>
+                      <SelectItem value="unani">Unani</SelectItem>
+                      <SelectItem value="icd11">ICD-11</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Concept ID</label>
+                  <Input
+                    placeholder={`Enter concept ID (e.g., ${systemInfo[selectedSystem].exampleId})`}
+                    value={conceptId}
+                    onChange={(e) => setConceptId(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleFetchDetails()}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Minimum Confidence</label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0.0"
+                    max="1.0"
+                    value={minConfidence}
+                    onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="validatedOnly"
+                    checked={validatedOnly}
+                    onChange={(e) => setValidatedOnly(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  <label htmlFor="validatedOnly" className="text-sm font-medium">
+                    Show only validated mappings
+                  </label>
+                </div>
+                
+                {selectedSystem !== 'icd11' && (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="includeEmbeddings"
+                      checked={includeEmbeddings}
+                      onChange={(e) => setIncludeEmbeddings(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <label htmlFor="includeEmbeddings" className="text-sm font-medium">
+                      Include embeddings
+                    </label>
+                  </div>
+                )}
+                
+                <Button onClick={handleFetchDetails} disabled={loading} className="w-full">
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  ) : (
+                    <Database className="h-4 w-4 mr-2" />
+                  )}
+                  Fetch Concept Details
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-blue-500" />
+                Endpoint Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Method</h4>
+                  <Badge variant="outline" className="mb-2">GET</Badge>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">URL</h4>
+                  <div className="bg-muted p-2 rounded text-sm overflow-x-auto">
+                    <code>{`${API_BASE_URL_DISPLAY}/namasthe_mapping/${selectedSystem}/{concept_id}/detail/`}</code>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Parameters</h4>
+                  <ul className="text-sm space-y-2">
+                    <li><span className="font-medium">concept_id</span> - Primary key ID of the concept</li>
+                    <li><span className="font-medium">min_confidence</span> - Filter mappings by minimum confidence score (0.0-1.0)</li>
+                    <li><span className="font-medium">validated_only</span> - Show only expert-validated mappings</li>
+                    {selectedSystem !== 'icd11' && (
+                      <li><span className="font-medium">include_embeddings</span> - Include 768-dimensional embeddings in response</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div>
+          <ApiResponseDisplay data={responseData} loading={loading} error={error} />
+          
+          {responseData && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Concept Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {responseData.concept && (
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Concept Information</h4>
+                      <div className="bg-muted p-3 rounded text-sm">
+                        <p><span className="font-medium">ID:</span> {responseData.concept.id}</p>
+                        <p><span className="font-medium">Code:</span> {responseData.concept.code}</p>
+                        <p><span className="font-medium">English Name:</span> {responseData.concept.english_name}</p>
+                        {responseData.concept.tamil_name && (
+                          <p><span className="font-medium">Tamil Name:</span> {responseData.concept.tamil_name}</p>
+                        )}
+                        {responseData.concept.arabic_name && (
+                          <p><span className="font-medium">Arabic Name:</span> {responseData.concept.arabic_name}</p>
+                        )}
+                        {responseData.concept.definition && (
+                          <p><span className="font-medium">Definition:</span> {responseData.concept.definition}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {responseData.mapping_statistics && (
+                      <div>
+                        <h4 className="font-medium mb-2">Mapping Statistics</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-blue-50 p-2 rounded">
+                            <p className="text-sm font-medium">Total Mappings</p>
+                            <p className="text-lg font-bold">{responseData.mapping_statistics.total_mappings}</p>
+                          </div>
+                          <div className="bg-green-50 p-2 rounded">
+                            <p className="text-sm font-medium">Validated</p>
+                            <p className="text-lg font-bold">{responseData.mapping_statistics.validated_mappings}</p>
+                          </div>
+                          <div className="bg-yellow-50 p-2 rounded">
+                            <p className="text-sm font-medium">High Confidence</p>
+                            <p className="text-lg font-bold">{responseData.mapping_statistics.high_confidence_mappings}</p>
+                          </div>
+                          <div className="bg-purple-50 p-2 rounded">
+                            <p className="text-sm font-medium">Avg Confidence</p>
+                            <p className="text-lg font-bold">
+                              {responseData.mapping_statistics.quality_metrics?.average_confidence 
+                                ? (responseData.mapping_statistics.quality_metrics.average_confidence * 100).toFixed(1) + '%'
+                                : 'N/A'
+                              }
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
@@ -2593,6 +3036,43 @@ const AllEndpointsPage = () => {
       }
     },
     {
+      name: "Combined Search",
+      method: "GET",
+      endpoint: `/terminologies/search/combined/?q=query&fuzzy=true&use_fts=true`,
+      description: "Search across all ICD-11 terms and their related NAMASTE concepts",
+      sample: {
+        results: [
+          {
+            id: 2909,
+            code: "5A13.5",
+            title: "Diabetes mellitus due to uncommon forms of immune-mediated diabetes",
+            definition: "Other specified diabetes mellitus due to uncommon forms of immune-mediated diabetes is a form of diabetes...",
+            related_ayurveda: null,
+            related_siddha: null,
+            related_unani: null,
+            mapping_info: null,
+            search_score: 0.8186077
+          }
+        ],
+        pagination: {
+          page: 1,
+          page_size: 10,
+          total_pages: 13,
+          total_count: 124,
+          has_next: true,
+          has_previous: false
+        },
+        search_metadata: {
+          query: "diabetes",
+          search_strategy: "full_text_search",
+          total_icd_matches: 124,
+          matches_with_namaste: 1,
+          executed_at: "2025-09-26T18:09:38.229353+00:00",
+          similarity_threshold: 0.2
+        }
+      }
+    },
+    {
       name: "Ayurveda Autocomplete",
       method: "GET",
       endpoint: `/terminologies/ayurveda/autocomplete/?q=query&limit=10`,
@@ -2677,6 +3157,79 @@ const AllEndpointsPage = () => {
         errors: [],
         summary: "CSV processed successfully"
       }
+    },
+    {
+      name: "Siddha Concept Details",
+      method: "GET",
+      endpoint: `/namasthe_mapping/siddha/{concept_id}/detail/`,
+      description: "Get detailed Siddha concept information with all mapped ICD-11 terms",
+      sample: {
+        concept: {
+          id: 123,
+          code: "BIA1.10",
+          english_name: "Skin lesions in the ears due to toxins",
+          tamil_name: "விட செவிக் குட்டம்",
+          romanized_name: "Viṭa Cevik Kuṭṭam"
+        },
+        mapping_statistics: {
+          total_mappings: 3,
+          validated_mappings: 0,
+          high_confidence_mappings: 3
+        }
+      }
+    },
+    {
+      name: "Unani Concept Details",
+      method: "GET",
+      endpoint: `/namasthe_mapping/unani/{concept_id}/detail/`,
+      description: "Get detailed Unani concept information with all mapped ICD-11 terms",
+      sample: {
+        concept: {
+          id: 123,
+          code: "A-36.15",
+          english_name: "Headache due to hyperaesthesia",
+          arabic_name: "صداع حسي",
+          romanized_name: "Ṣudā‘Ḥissī"
+        },
+        mapping_statistics: {
+          total_mappings: 3,
+          validated_mappings: 0,
+          high_confidence_mappings: 3
+        }
+      }
+    },
+    {
+      name: "ICD-11 Concept Details",
+      method: "GET",
+      endpoint: `/namasthe_mapping/icd11/{concept_id}/detail/`,
+      description: "Get detailed ICD-11 concept information with all related NAMASTE concepts",
+      sample: {
+        concept: {
+          id: 123,
+          code: "1A72.4",
+          title: "Gonococcal infection of eye",
+          definition: "This is a species of Gram-negative coffee bean-shaped diplococci bacteria responsible for the sexually transmitted infection gonorrhoea."
+        }
+      }
+    },
+    {
+      name: "Mapping Statistics",
+      method: "GET",
+      endpoint: `/terminologies/mappings/stats/`,
+      description: "Get comprehensive mapping statistics across all systems",
+      sample: {
+        total_mappings: 2399,
+        by_system: {
+          ayurveda: 787,
+          siddha: 490,
+          unani: 1122
+        },
+        confidence_distribution: {
+          high_confidence: 437,
+          medium_confidence: 976,
+          low_confidence: 986
+        }
+      }
     }
   ];
 
@@ -2704,7 +3257,7 @@ const AllEndpointsPage = () => {
             <CardContent>
               <div className="bg-muted p-4 rounded-lg mb-6">
                 <div className="flex justify-between items-center">
-                  <code className="text-sm break-all">{API_BASE_URL_DISPLAY}{endpoint.endpoint}</code>
+                  <code className="text-sm break-all overflow-x-auto max-w-full">{API_BASE_URL_DISPLAY}{endpoint.endpoint}</code>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -2743,37 +3296,97 @@ const AllEndpointsPage = () => {
 
 // Analytics Page Component
 const AnalyticsPage = () => {
-  // Mock data for charts
-  const usageData = {
-    ayurveda: 1250,
-    siddha: 850,
-    unani: 920,
-    icd11: 1560,
-    mappings: 2100
-  };
-  
-  const successRates = {
-    ayurveda: 98,
-    siddha: 95,
-    unani: 96,
-    icd11: 99,
-    mappings: 92
-  };
-  
-  const popularSearches = [
-    { term: "fever", count: 342 },
-    { term: "diabetes", count: 287 },
-    { term: "headache", count: 231 },
-    { term: "cough", count: 198 },
-    { term: "asthma", count: 176 }
-  ];
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch real-time stats on mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/terminologies/mappings/stats/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setStats(data);
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching stats:", err);
+        // Fallback data
+        setStats({
+          total_mappings: 2399,
+          by_system: {
+            ayurveda: 787,
+            siddha: 490,
+            unani: 1122
+          },
+          confidence_distribution: {
+            high_confidence: 437,
+            medium_confidence: 976,
+            low_confidence: 986
+          },
+          top_icd_matches: [
+            {
+              icd_term__code: "1B20.3",
+              icd_term__title: "Complications of leprosy",
+              mapping_count: 44
+            },
+            {
+              icd_term__code: "8D43.5",
+              icd_term__title: "Cassava poisoning",
+              mapping_count: 30
+            }
+          ],
+          recent_mappings: [
+            {
+              source_system: "siddha",
+              source_term: "Pulmonary tuberculosis",
+              icd_title: "Tuberculosis",
+              confidence_score: 0.78,
+              created_at: "2025-09-11T22:58:13.221955+05:30"
+            }
+          ]
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="px-4 py-8 max-w-6xl mx-auto">
+        <div className="flex items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span className="ml-2">Loading analytics data...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="px-4 py-8 max-w-6xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3" />
+          <div>
+            <h4 className="text-red-800 font-medium">Error fetching analytics</h4>
+            <p className="text-red-700 text-sm mt-1">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-4">API Analytics</h2>
         <p className="text-muted-foreground">
-          View usage statistics, success rates, and popular searches across all API endpoints.
+          View real-time usage statistics, mapping distribution, and system performance metrics.
         </p>
       </div>
       
@@ -2782,22 +3395,27 @@ const AnalyticsPage = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <BarChart3 className="h-5 w-5 mr-2 text-blue-500" />
-              API Usage Statistics
+              Mapping Statistics
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Object.entries(usageData).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="capitalize">{key}</span>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-3xl font-bold text-blue-600">{stats.total_mappings}</div>
+                <div className="text-sm text-blue-800">Total Mappings</div>
+              </div>
+              
+              {Object.entries(stats.by_system).map(([system, count]) => (
+                <div key={system} className="flex items-center justify-between">
+                  <span className="capitalize font-medium">{system}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-32 bg-muted rounded-full h-2.5">
                       <div 
                         className="bg-blue-500 h-2.5 rounded-full" 
-                        style={{ width: `${(value / 2500) * 100}%` }}
+                        style={{ width: `${(count / stats.total_mappings) * 100}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium">{value}</span>
+                    <span className="text-sm font-medium">{count}</span>
                   </div>
                 </div>
               ))}
@@ -2809,22 +3427,68 @@ const AnalyticsPage = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <PieChart className="h-5 w-5 mr-2 text-green-500" />
-              Success Rates
+              Confidence Distribution
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Object.entries(successRates).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="capitalize">{key}</span>
+              {Object.entries(stats.confidence_distribution).map(([level, count]) => (
+                <div key={level} className="flex items-center justify-between">
+                  <span className="capitalize font-medium">{level.replace('_', ' ')}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-32 bg-muted rounded-full h-2.5">
                       <div 
                         className="bg-green-500 h-2.5 rounded-full" 
-                        style={{ width: `${value}%` }}
+                        style={{ width: `${(count / stats.total_mappings) * 100}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium">{value}%</span>
+                    <span className="text-sm font-medium">{count}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Top ICD-11 Matches</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {stats.top_icd_matches && stats.top_icd_matches.slice(0, 5).map((match, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div>
+                    <span className="font-medium block">{match.icd_term__title}</span>
+                    <span className="text-sm text-muted-foreground">{match.icd_term__code}</span>
+                  </div>
+                  <Badge variant="secondary">{match.mapping_count} mappings</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Mappings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {stats.recent_mappings && stats.recent_mappings.slice(0, 5).map((mapping, index) => (
+                <div key={index} className="p-3 bg-muted rounded-lg">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-medium">{mapping.source_term}</span>
+                    <Badge variant="outline" className="capitalize">{mapping.source_system}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">→ {mapping.icd_title}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(mapping.created_at).toLocaleDateString()}
+                    </span>
+                    <Badge variant="secondary">{(mapping.confidence_score * 100).toFixed(1)}%</Badge>
                   </div>
                 </div>
               ))}
@@ -2835,14 +3499,17 @@ const AnalyticsPage = () => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Popular Searches</CardTitle>
+          <CardTitle>System Distribution</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {popularSearches.map((search, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span className="font-medium">{search.term}</span>
-                <Badge variant="secondary">{search.count} searches</Badge>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(stats.by_system).map(([system, count]) => (
+              <div key={system} className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold mb-1">{count}</div>
+                <div className="text-sm font-medium capitalize">{system} Mappings</div>
+                <div className="text-xs text-muted-foreground">
+                  {((count / stats.total_mappings) * 100).toFixed(1)}% of total
+                </div>
               </div>
             ))}
           </div>
@@ -2929,7 +3596,7 @@ const HomePage = () => {
                 <p className="text-muted-foreground mb-4">
                   Search Ayurveda medical terminologies with English names, Hindi names, and diacritical representations.
                 </p>
-                <div className="bg-muted p-3 rounded text-sm mb-4">
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/ayurveda/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
@@ -2949,7 +3616,7 @@ const HomePage = () => {
                 <p className="text-muted-foreground mb-4">
                   Search Siddha medical terminologies with English names, Tamil names, and romanized representations.
                 </p>
-                <div className="bg-muted p-3 rounded text-sm mb-4">
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/siddha/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
@@ -2969,7 +3636,7 @@ const HomePage = () => {
                 <p className="text-muted-foreground mb-4">
                   Search Unani medical terminologies with English names, Arabic names, and romanized representations.
                 </p>
-                <div className="bg-muted p-3 rounded text-sm mb-4">
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/unani/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
@@ -2989,7 +3656,7 @@ const HomePage = () => {
                 <p className="text-muted-foreground mb-4">
                   Search ICD-11 medical codes and terminologies with detailed information.
                 </p>
-                <div className="bg-muted p-3 rounded text-sm mb-4">
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>GET {API_BASE_URL_DISPLAY}/terminologies/icd11/search/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
@@ -3001,7 +3668,27 @@ const HomePage = () => {
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Upload className="h-5 w-5 mr-2 text-red-500" />
+                  <Map className="h-5 w-5 mr-2 text-red-500" />
+                  Mappings API
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores.
+                </p>
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
+                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/mappings/?system=ayurveda&q=query</code>
+                </div>
+                <Button asChild variant="outline">
+                  <Link to="/mappings-testing">Explore Mappings API</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Upload className="h-5 w-5 mr-2 text-yellow-500" />
                   Upload CSV API
                 </CardTitle>
               </CardHeader>
@@ -3009,7 +3696,7 @@ const HomePage = () => {
                 <p className="text-muted-foreground mb-4">
                   Upload CSV files to populate traditional medicine terminology databases. Updates existing records by code or creates new ones.
                 </p>
-                <div className="bg-muted p-3 rounded text-sm mb-4">
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
                   <code>POST {API_BASE_URL_DISPLAY}/terminologies/{`{system}`}/csv/upload/</code>
                 </div>
                 <Button asChild variant="outline">
@@ -3021,19 +3708,19 @@ const HomePage = () => {
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Zap className="h-5 w-5 mr-2 text-yellow-500" />
-                  Autocomplete API
+                  <Zap className="h-5 w-5 mr-2 text-indigo-500" />
+                  Combined Search API
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  Fast autocomplete endpoints for traditional medicine terminologies - returns only matching titles for optimal performance.
+                  Search across all ICD-11 terms and their related NAMASTE concepts in one API call.
                 </p>
-                <div className="bg-muted p-3 rounded text-sm mb-4">
-                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/{`{system}`}/autocomplete/?q=query</code>
+                <div className="bg-muted p-3 rounded text-sm mb-4 overflow-x-auto">
+                  <code>GET {API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=query</code>
                 </div>
                 <Button asChild variant="outline">
-                  <Link to="/autocomplete">Explore Autocomplete API</Link>
+                  <Link to="/mappings-testing">Explore Combined Search</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -3112,6 +3799,7 @@ function App() {
             <Route path="/autocomplete" element={<AutocompletePage />} />
             <Route path="/all-endpoints" element={<AllEndpointsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/mappings" element={<MappingsPage />} />
           </Routes>
         </div>
       </div>
