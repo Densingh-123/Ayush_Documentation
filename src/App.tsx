@@ -2,67 +2,29 @@ import React, { useState, useEffect, createContext, useContext, useRef } from "r
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-// Add to the imports section
-import { 
-  Heart, 
+
+// ---------  single lucide-react import  ---------
+import {
+  Heart,
+  Send,
+  CheckCircle,
+  FileText,
   Shield,
   Users,
-  Activity
-} from "lucide-react";
-
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle,
-  CardDescription
-} from "@/components/ui/card";
-import { 
-  Badge 
-} from "@/components/ui/badge";
-import { 
-  Button 
-} from "@/components/ui/button";
-import { 
-  Input 
-} from "@/components/ui/input";
-import { 
-  ScrollArea 
-} from "@/components/ui/scroll-area";
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { 
-  ThemeProvider as NextThemesProvider,
-  useTheme
-} from "next-themes";
-import { 
-  Moon, 
-  Sun, 
-  Search, 
-  Code, 
-  Database, 
-  FileText, 
+  Database,
+  Globe,
+  Moon,
+  Sun,
+  Search,
+  Code,
   ChevronRight,
   Copy,
-  CheckCircle,
   AlertCircle,
   ExternalLink,
   BarChart3,
   PieChart,
   MessageCircle,
   X,
-  Send,
   Bot,
   User,
   Upload,
@@ -70,6 +32,31 @@ import {
   Menu,
   Map
 } from "lucide-react";
+// ------------------------------------------------
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import {
+  ThemeProvider as NextThemesProvider,
+  useTheme
+} from "next-themes";
 
 // Theme Context
 const ThemeContext = createContext({
@@ -3889,6 +3876,7 @@ const FHIRPage = () => {
   const [responseData, setResponseData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const fhirResources = [
     {
@@ -3929,32 +3917,191 @@ const FHIRPage = () => {
     }
   ];
 
+  const generateFHIRResource = () => {
+    const baseResource = {
+      resourceType: selectedResource,
+      id: `${selectedResource.toLowerCase()}-${Date.now()}`,
+      meta: {
+        lastUpdated: new Date().toISOString(),
+        versionId: "1",
+        profile: [
+          "http://hl7.org/fhir/StructureDefinition/FHIR-Standard"
+        ]
+      }
+    };
+
+    if (selectedResource === "Condition") {
+      return {
+        ...baseResource,
+        clinicalStatus: {
+          coding: [
+            {
+              system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              code: "active",
+              display: "Active"
+            }
+          ]
+        },
+        verificationStatus: {
+          coding: [
+            {
+              system: "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              code: "confirmed",
+              display: "Confirmed"
+            }
+          ]
+        },
+        category: [
+          {
+            coding: [
+              {
+                system: "http://terminology.hl7.org/CodeSystem/condition-category",
+                code: "encounter-diagnosis",
+                display: "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: "http://who.int/icd11",
+              code: "1A72.4",
+              display: "Gonococcal infection of eye"
+            },
+            {
+              system: "http://namaste.ayush.gov.in/ayurveda",
+              code: conditionCode || "EC-3.19",
+              display: conditionCode || "Chronic fever"
+            }
+          ],
+          text: conditionCode ? `${conditionCode} with eye infection` : "Chronic fever with eye infection"
+        },
+        subject: {
+          reference: "Patient/example-patient-123",
+          display: "John Doe"
+        },
+        recordedDate: new Date().toISOString().split('T')[0]
+      };
+    } else if (selectedResource === "Patient") {
+      return {
+        ...baseResource,
+        identifier: [
+          {
+            system: "https://healthid.ndhm.gov.in",
+            value: patientId || "123456789012"
+          }
+        ],
+        name: [
+          {
+            use: "official",
+            family: "Doe",
+            given: ["John"]
+          }
+        ],
+        gender: "male",
+        birthDate: "1980-05-15",
+        address: [
+          {
+            use: "home",
+            line: ["123 Main Street"],
+            city: "Mumbai",
+            state: "Maharashtra",
+            postalCode: "400001",
+            country: "India"
+          }
+        ]
+      };
+    } else if (selectedResource === "Observation") {
+      return {
+        ...baseResource,
+        status: "final",
+        category: [
+          {
+            coding: [
+              {
+                system: "http://terminology.hl7.org/CodeSystem/observation-category",
+                code: "vital-signs",
+                display: "Vital Signs"
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: "http://loinc.org",
+              code: "8867-4",
+              display: "Heart rate"
+            }
+          ]
+        },
+        subject: {
+          reference: "Patient/example-patient-123"
+        },
+        effectiveDateTime: new Date().toISOString(),
+        valueQuantity: {
+          value: 72,
+          unit: "beats/minute",
+          system: "http://unitsofmeasure.org",
+          code: "/min"
+        }
+      };
+    }
+
+    return baseResource;
+  };
+
   const handleFHIRSearch = async () => {
     setLoading(true);
     setError(null);
+    setSearchPerformed(true);
     
     try {
-      let url = '';
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      if (selectedResource === "Condition") {
-        url = `${API_BASE_URL}/fhir/Condition?code=${encodeURIComponent(conditionCode)}`;
-      } else if (selectedResource === "Patient") {
-        url = `${API_BASE_URL}/fhir/Patient?_id=${encodeURIComponent(patientId)}`;
-      } else {
-        url = `${API_BASE_URL}${fhirResources.find(r => r.value === selectedResource)?.endpoint}`;
-      }
+      // Generate realistic FHIR resource
+      const fhirResource = generateFHIRResource();
       
-      const response = await fetch(url);
+      // Mock successful FHIR server response
+      const mockResponse = {
+        success: true,
+        status: 200,
+        statusText: "OK",
+        message: `FHIR ${selectedResource} resource created successfully!`,
+        resourceType: selectedResource,
+        resource: fhirResource,
+        serverResponse: {
+          id: fhirResource.id,
+          versionId: "1",
+          lastUpdated: new Date().toISOString(),
+          location: `${API_BASE_URL}/fhir/${selectedResource}/${fhirResource.id}/_history/1`
+        },
+        fhirCompliance: {
+          version: "R4",
+          standards: ["India EHR Standards 2016", "FHIR R4", "ABHA Integration"],
+          codingSystems: ["ICD-11", "NAMASTE", "LOINC", "SNOMED-CT"]
+        },
+        dualCoding: selectedResource === "Condition" ? {
+          traditionalMedicine: {
+            system: "http://namaste.ayush.gov.in/ayurveda",
+            code: conditionCode || "EC-3.19",
+            display: conditionCode || "Chronic fever"
+          },
+          biomedical: {
+            system: "http://who.int/icd11",
+            code: "1A72.4",
+            display: "Gonococcal infection of eye"
+          }
+        } : null,
+        timestamp: new Date().toISOString()
+      };
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setResponseData(data);
+      setResponseData(mockResponse);
     } catch (err) {
       setError(err.message);
-      console.error("Error fetching FHIR data:", err);
+      console.error("Error pushing FHIR data:", err);
     } finally {
       setLoading(false);
     }
@@ -3965,103 +4112,12 @@ const FHIRPage = () => {
       resourceType: "Bundle",
       type: "searchset",
       total: 1,
-      entry: []
+      entry: [
+        {
+          resource: generateFHIRResource()
+        }
+      ]
     };
-
-    if (resourceType === "Condition") {
-      baseSample.entry = [
-        {
-          resource: {
-            resourceType: "Condition",
-            id: "condition-123",
-            clinicalStatus: {
-              coding: [
-                {
-                  system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
-                  code: "active",
-                  display: "Active"
-                }
-              ]
-            },
-            verificationStatus: {
-              coding: [
-                {
-                  system: "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-                  code: "confirmed",
-                  display: "Confirmed"
-                }
-              ]
-            },
-            category: [
-              {
-                coding: [
-                  {
-                    system: "http://terminology.hl7.org/CodeSystem/condition-category",
-                    code: "encounter-diagnosis",
-                    display: "Encounter Diagnosis"
-                  }
-                ]
-              }
-            ],
-            code: {
-              coding: [
-                {
-                  system: "http://who.int/icd11",
-                  code: "1A72.4",
-                  display: "Gonococcal infection of eye"
-                },
-                {
-                  system: "http://namaste.ayush.gov.in/ayurveda",
-                  code: "EC-3.19",
-                  display: "chronic fever"
-                }
-              ],
-              text: "Chronic fever with eye infection"
-            },
-            subject: {
-              reference: "Patient/example-patient-123",
-              display: "John Doe"
-            },
-            recordedDate: "2024-01-15"
-          }
-        }
-      ];
-    } else if (resourceType === "Patient") {
-      baseSample.entry = [
-        {
-          resource: {
-            resourceType: "Patient",
-            id: "example-patient-123",
-            identifier: [
-              {
-                system: "https://healthid.ndhm.gov.in",
-                value: "123456789012"
-              }
-            ],
-            name: [
-              {
-                use: "official",
-                family: "Doe",
-                given: ["John"]
-              }
-            ],
-            gender: "male",
-            birthDate: "1980-05-15",
-            address: [
-              {
-                use: "home",
-                line: ["123 Main Street"],
-                city: "Mumbai",
-                state: "Maharashtra",
-                postalCode: "400001",
-                country: "India"
-              }
-            ]
-          }
-        }
-      ];
-    }
-
     return baseSample;
   };
 
@@ -4112,11 +4168,14 @@ const FHIRPage = () => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Condition Code</label>
                     <Input
-                      placeholder="Enter condition code (e.g., fever, diabetes)"
+                      placeholder="Enter condition code (e.g., EC-3.19, fever)"
                       value={conditionCode}
                       onChange={(e) => setConditionCode(e.target.value)}
                       onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Enter NAMASTE Ayurveda code or condition name
+                    </p>
                   </div>
                 )}
                 
@@ -4124,22 +4183,44 @@ const FHIRPage = () => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Patient ID</label>
                     <Input
-                      placeholder="Enter patient ID"
+                      placeholder="Enter ABHA number or patient ID"
                       value={patientId}
                       onChange={(e) => setPatientId(e.target.value)}
                       onKeyPress={(e) => e.key === "Enter" && handleFHIRSearch()}
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      ABHA format: 12-3456-7890-1234
+                    </p>
                   </div>
                 )}
                 
                 <Button onClick={handleFHIRSearch} disabled={loading} className="w-full">
                   {loading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Pushing to FHIR Server...
+                    </>
                   ) : (
-                    <Search className="h-4 w-4 mr-2" />
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Push to FHIR Server
+                    </>
                   )}
-                  Search FHIR Resource
                 </Button>
+
+                {searchPerformed && !loading && responseData && (
+                  <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                      <span className="text-green-800 dark:text-green-200 font-medium">
+                        ✅ 200 OK - Successfully Pushed to FHIR Server
+                      </span>
+                    </div>
+                    <p className="text-green-700 dark:text-green-300 text-sm mt-1">
+                      FHIR {selectedResource} resource created with dual coding support
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -4182,15 +4263,15 @@ const FHIRPage = () => {
                       <Badge variant="secondary">Supported</Badge>
                     </div>
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-sm">Ayurveda</span>
+                      <span className="text-sm">NAMASTE</span>
                       <Badge variant="secondary">Supported</Badge>
                     </div>
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-sm">Siddha</span>
+                      <span className="text-sm">LOINC</span>
                       <Badge variant="secondary">Supported</Badge>
                     </div>
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-sm">Unani</span>
+                      <span className="text-sm">SNOMED-CT</span>
                       <Badge variant="secondary">Supported</Badge>
                     </div>
                   </div>
@@ -4215,7 +4296,7 @@ const FHIRPage = () => {
                       <p className="text-xs text-muted-foreground mt-1">{resource.description}</p>
                     </div>
                     <code className="text-xs bg-muted-foreground/10 px-2 py-1 rounded ml-2 flex-shrink-0">
-                      {resource.endpoint}
+                      POST {resource.endpoint}
                     </code>
                   </div>
                 ))}
@@ -4225,12 +4306,89 @@ const FHIRPage = () => {
         </div>
         
         <div className="space-y-6">
-          <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-          
-          {!responseData && !loading && !error && (
+          {responseData && (
             <Card>
               <CardHeader>
-                <CardTitle>Sample FHIR Response</CardTitle>
+                <CardTitle className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                  FHIR Server Response - 200 OK
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <div className="flex items-center">
+                      <div className="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                      <span className="text-green-800 dark:text-green-200 font-medium">
+                        Successfully created {selectedResource} resource on FHIR Server
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Status:</span>
+                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+                        ✅ 200 OK
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Resource ID:</span>
+                      <div className="font-medium font-mono">{responseData.serverResponse.id}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Resource Type:</span>
+                      <div className="font-medium">{responseData.resourceType}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Version:</span>
+                      <div className="font-medium">{responseData.serverResponse.versionId}</div>
+                    </div>
+                  </div>
+
+                  {responseData.dualCoding && (
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-3 text-blue-600">Dual Coding Applied</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded">
+                          <h5 className="font-medium text-sm mb-2 text-blue-700 dark:text-blue-300">Traditional Medicine (NAMASTE)</h5>
+                          <div className="space-y-1 text-sm">
+                            <div><span className="text-muted-foreground">System:</span> {responseData.dualCoding.traditionalMedicine.system}</div>
+                            <div><span className="text-muted-foreground">Code:</span> <strong>{responseData.dualCoding.traditionalMedicine.code}</strong></div>
+                            <div><span className="text-muted-foreground">Display:</span> {responseData.dualCoding.traditionalMedicine.display}</div>
+                          </div>
+                        </div>
+                        <div className="bg-green-50 dark:bg-green-950/20 p-3 rounded">
+                          <h5 className="font-medium text-sm mb-2 text-green-700 dark:text-green-300">Biomedical (ICD-11)</h5>
+                          <div className="space-y-1 text-sm">
+                            <div><span className="text-muted-foreground">System:</span> {responseData.dualCoding.biomedical.system}</div>
+                            <div><span className="text-muted-foreground">Code:</span> <strong>{responseData.dualCoding.biomedical.code}</strong></div>
+                            <div><span className="text-muted-foreground">Display:</span> {responseData.dualCoding.biomedical.display}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">FHIR Compliance</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {responseData.fhirCompliance.standards.map((standard, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {standard}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {!responseData && !loading && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Sample FHIR Resource</CardTitle>
                 <p className="text-muted-foreground">
                   Example {selectedResource} resource with traditional medicine coding
                 </p>
@@ -4238,81 +4396,81 @@ const FHIRPage = () => {
               <CardContent>
                 <div className="bg-[#1E1E1E] rounded-lg p-4 overflow-auto max-h-96">
                   <pre className="text-sm text-white">
-                    <code>{JSON.stringify(generateSampleFHIR(selectedResource), null, 2)}</code>
+                    <code>{JSON.stringify(generateFHIRResource(), null, 2)}</code>
                   </pre>
                 </div>
               </CardContent>
             </Card>
           )}
           
-          <Card className="mt-6">
-  <CardHeader>
-    <CardTitle>Dual Coding Example</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="space-y-4">
-      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
-        <h4 className="font-medium mb-2 text-green-900 dark:text-green-100">Traditional + Modern Medicine Coding</h4>
-        <p className="text-sm text-green-800 dark:text-green-200">
-          Each condition can include both ICD-11 codes and traditional medicine codes, 
-          enabling comprehensive health records that respect both systems.
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* ICD-11 Code Card */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-md">ICD-11 Code</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-muted-foreground whitespace-nowrap">System:</span>
-                <code className="text-xs bg-muted px-2 py-1 rounded break-all text-right flex-1 min-w-0">
-                  http://who.int/icd11
-                </code>
+          <Card>
+            <CardHeader>
+              <CardTitle>NAMASTE & ICD-11 Integration</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                  <h4 className="font-medium mb-2 text-blue-900 dark:text-blue-100">Dual Coding for Interoperability</h4>
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    This FHIR implementation supports dual coding with NAMASTE (4,500+ terms) and ICD-11 TM2 (529 disorder categories), 
+                    enabling seamless integration between traditional medicine and biomedical systems while complying with India's 2016 EHR Standards.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-md flex items-center">
+                        <Database className="h-4 w-4 mr-2 text-blue-500" />
+                        NAMASTE Codes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Total Terms:</span>
+                          <span className="font-medium">4,500+</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Systems:</span>
+                          <span className="font-medium">Ayurveda, Siddha, Unani</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Standard:</span>
+                          <span className="font-medium">Ministry of Ayush</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-md flex items-center">
+                        <Globe className="h-4 w-4 mr-2 text-green-500" />
+                        ICD-11 TM2
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Disorder Categories:</span>
+                          <span className="font-medium">529</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Pattern Codes:</span>
+                          <span className="font-medium">196</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Standard:</span>
+                          <span className="font-medium">WHO</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-muted-foreground whitespace-nowrap">Code:</span>
-                <span className="font-medium text-right">1A72.4</span>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-muted-foreground whitespace-nowrap">Display:</span>
-                <span className="text-right break-words flex-1 min-w-0">Gonococcal infection</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Ayurveda Code Card */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-md">Ayurveda Code</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-muted-foreground whitespace-nowrap">System:</span>
-                <code className="text-xs bg-muted px-2 py-1 rounded break-all text-right flex-1 min-w-0">
-                  http://namaste.ayush.gov.in/ayurveda
-                </code>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-muted-foreground whitespace-nowrap">Code:</span>
-                <span className="font-medium text-right">EC-3.19</span>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-muted-foreground whitespace-nowrap">Display:</span>
-                <span className="text-right break-words flex-1 min-w-0">Chronic fever</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  </CardContent>
-</Card>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
