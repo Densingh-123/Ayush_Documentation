@@ -68,7 +68,7 @@ const ThemeContext = createContext({
 const useThemeContext = () => useContext(ThemeContext);
 
 // API base URL
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://ayushbandan.duckdns.org";
 const API_BASE_URL_DISPLAY = "{{base_url}}";
 
 // Animation variants
@@ -718,7 +718,7 @@ const AIChatbot = () => {
     
     // Usage examples
     if (lowercaseInput.includes("how to use") || lowercaseInput.includes("implementation") || lowercaseInput.includes("code example")) {
-      return "You can use the API by making HTTP GET requests to the endpoints. For example, to search Ayurveda terms: `fetch('http://localhost:8000/terminologies/ayurveda/search/?q=fever')`. Check the documentation for more examples.";
+      return "You can use the API by making HTTP GET requests to the endpoints. For example, to search Ayurveda terms: `fetch('https://ayushbandan.duckdns.org/terminologies/ayurveda/search/?q=fever')`. Check the documentation for more examples.";
     }
     
     // Response time
