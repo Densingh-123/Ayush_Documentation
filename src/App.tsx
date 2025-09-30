@@ -836,7 +836,7 @@ const AIChatbot = () => {
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 w-full max-w-sm h-[500px] shadow-xl z-50 flex flex-col mx-4 sm:mx-0">
+<Card className="fixed bottom-6 right-6 w-full max-w-[380px] h-[580px] shadow-xl z-50 flex flex-col mx-4 sm:mx-0 translate-x-[30px] sm:translate-x-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -3073,71 +3073,86 @@ const AllEndpointsPage = () => {
               className="p-6 cursor-pointer hover:bg-muted/50 transition-colors"
               onClick={() => toggleEndpoint(endpoint.name)}
             >
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-start gap-3">
-                    <Badge variant="outline" className="mt-1">{endpoint.method}</Badge>
-                    <div>
-                      <h3 className="font-semibold text-lg">{endpoint.name}</h3>
-                      <p className="text-muted-foreground mt-1">{endpoint.description}</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
-                    <code className="bg-muted px-3 py-1.5 rounded text-sm flex-1 overflow-x-auto">
-                      {API_BASE_URL_DISPLAY}{endpoint.endpoint}
-                    </code>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(API_BASE_URL_DISPLAY + endpoint.endpoint);
-                      }}
-                      className="shrink-0 bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white"
-                    >
-                      <Copy className="h-4 w-4 mr-1" />
-                      Copy
-                    </Button>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleEndpoint(endpoint.name);
-                  }}
-                  className="shrink-0"
-                >
-                  <ChevronRight 
-                    className={`h-4 w-4 transition-transform ${
-                      expandedEndpoint === endpoint.name ? 'rotate-90' : ''
-                    }`} 
-                  />
-                </Button>
-              </div>
+          {/* ----------  responsive endpoint card  ---------- */}
+<div className="flex flex-col gap-3">
+  {/* top line : method + name + toggle chevron */}
+  <div className="flex items-start gap-3">
+    <Badge variant="outline" className="shrink-0 mt-1">
+      {endpoint.method}
+    </Badge>
+
+    <div className="min-w-0 flex-1">
+      <h3 className="font-semibold text-base break-words">{endpoint.name}</h3>
+      <p className="text-muted-foreground text-sm mt-1">{endpoint.description}</p>
+    </div>
+
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleEndpoint(endpoint.name);
+      }}
+      className="shrink-0"
+    >
+      <ChevronRight
+        className={`h-4 w-4 transition-transform ${
+          expandedEndpoint === endpoint.name ? 'rotate-90' : ''
+        }`}
+      />
+    </Button>
+  </div>
+
+  {/* endpoint line : label + url (scrollable) + copy button */}
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium shrink-0">URL:</span>
+
+    {/* scrollable url box */}
+    <div className="min-w-0 flex-1 rounded-md border bg-muted px-3 py-2">
+     <code className="text-sm leading-none whitespace-pre-wrap break-all">
+        {API_BASE_URL_DISPLAY}{endpoint.endpoint}
+      </code>
+    </div>
+
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={(e) => {
+        e.stopPropagation();
+        copyToClipboard(API_BASE_URL_DISPLAY + endpoint.endpoint);
+      }}
+      className="shrink-0 bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white"
+    >
+      <Copy className="h-4 w-4 mr-1" />
+      Copy
+    </Button>
+  </div>
+</div>
             </div>
             
-            <AnimatePresence>
-              {expandedEndpoint === endpoint.name && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden"
-                >
-                  <div className="p-6 border-t">
-                    <h4 className="font-medium mb-3">Sample Response</h4>
-                    <ScrollArea className="h-96 w-full rounded-md border">
-                      <pre className="p-4 text-sm bg-[#1E1E1E] text-white">
-                        <code>{JSON.stringify(endpoint.sample, null, 2)}</code>
-                      </pre>
-                    </ScrollArea>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+           <AnimatePresence>
+  {expandedEndpoint === endpoint.name && (
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="overflow-hidden"
+    >
+      {/*  FIXED 500 px wrapper  */}
+      <div className="max-w-[350px] md:max-w-none px-6 pb-6">
+        <h4 className="font-medium mb-3">Sample Response</h4>
+
+        {/*  scrollable JSON box  */}
+        <ScrollArea className="h-96 w-full rounded-md border">
+          <pre className="p-4 text-sm bg-[#1E1E1E] text-white">
+            <code>{JSON.stringify(endpoint.sample, null, 2)}</code>
+          </pre>
+        </ScrollArea>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
           </Card>
         ))}
       </div>
@@ -3250,7 +3265,7 @@ const AnalyticsPage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-4 max-w-[500px] md:max-w-none overflow-hidden">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <div className="text-3xl font-bold text-blue-600">{stats.total_mappings}</div>
                 <div className="text-sm text-blue-800">Total Mappings</div>
