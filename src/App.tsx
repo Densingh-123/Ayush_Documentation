@@ -3550,7 +3550,7 @@ const HomePage = () => {
                 </Button>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Heart className="h-5 w-5 mr-2 text-[#1e88e5]" />
