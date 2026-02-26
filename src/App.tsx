@@ -63,14 +63,14 @@ import {
 // Theme Context
 const ThemeContext = createContext({
   theme: "light",
-  toggleTheme: () => {},
+  toggleTheme: () => { },
 });
 
 // Custom hooks
 const useThemeContext = () => useContext(ThemeContext);
 
 // API base URL
-const API_BASE_URL = "https://ayushbandan.duckdns.org";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 const API_BASE_URL_DISPLAY = "{{base_url}}";
 
 // Animation variants
@@ -162,7 +162,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={onClose}
           />
-          
+
           {/* Sidebar */}
           <motion.aside
             initial={{ x: '-100%' }}
@@ -182,7 +182,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            
+
             <ScrollArea className="h-full p-4">
               <div className="space-y-2">
                 {sidebarItems.map((item) => (
@@ -226,9 +226,8 @@ const Header = () => {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all ${
-          isScrolled ? "shadow-md" : ""
-        }`}
+        className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all ${isScrolled ? "shadow-md" : ""
+          }`}
       >
         <div className="flex h-20 items-center justify-between px-4">
           {/* Left Section: Logo + Title + Mobile Menu Button */}
@@ -275,9 +274,9 @@ const Header = () => {
       </header>
 
       {/* Mobile Sidebar */}
-      <MobileSidebar 
-        isOpen={isMobileMenuOpen} 
-        onClose={() => setIsMobileMenuOpen(false)} 
+      <MobileSidebar
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
       />
     </>
   );
@@ -439,13 +438,13 @@ const AIChatbot = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      
+
       // Cache the response
       setCache(prevCache => ({
         ...prevCache,
         [url]: data
       }));
-      
+
       return data;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -465,10 +464,10 @@ const AIChatbot = () => {
 
     let response = `Found ${data.count} result(s) for "${query}" in ${system}:\n\n`;
     const itemsToShow = showAll ? data.results : data.results.slice(0, 5);
-    
+
     itemsToShow.forEach((item, index) => {
       response += `${index + 1}. `;
-      
+
       if (system === 'ayurveda') {
         response += `Code: ${item.code || 'N/A'}, English: ${item.english_name || 'N/A'}, Hindi: ${item.hindi_name || 'N/A'}\n`;
       } else if (system === 'siddha') {
@@ -495,7 +494,7 @@ const AIChatbot = () => {
     });
 
     const hasMore = data.count > 5 && !showAll;
-    
+
     if (hasMore) {
       response += `\n...and ${data.count - 5} more results.`;
     }
@@ -509,9 +508,9 @@ const AIChatbot = () => {
 
   const handleSeeMore = (messageId: string, fullData: ApiResponse, system: string, query: string) => {
     const formattedResponse = formatApiResponse(fullData, system, query, true);
-    
-    setMessages(prev => prev.map(msg => 
-      msg.id === messageId 
+
+    setMessages(prev => prev.map(msg =>
+      msg.id === messageId
         ? { ...msg, content: formattedResponse.content, hasMore: false }
         : msg
     ));
@@ -560,7 +559,7 @@ const AIChatbot = () => {
       let medicalSystem = context.lastSystem || 'ayurveda';
       if (lowercaseInput.includes('siddha')) medicalSystem = 'siddha';
       if (lowercaseInput.includes('unani')) medicalSystem = 'unani';
-      
+
       const query = inputValue.replace(/mapping|map|siddha|unani|ayurveda/gi, '').trim() || 'fever';
       apiUrl = `${API_BASE_URL}/terminologies/mappings/?system=${medicalSystem}&q=${encodeURIComponent(query)}&min_confidence=0.1`;
     } else if (lowercaseInput.includes('combined') || lowercaseInput.includes('all') || lowercaseInput.includes('search')) {
@@ -582,14 +581,14 @@ const AIChatbot = () => {
         sender: "bot",
         timestamp: new Date(),
       };
-      
+
       setMessages(prev => [...prev, loadingMessage]);
 
       const data = await fetchData(apiUrl);
-      
+
       // Remove loading message
       setMessages(prev => prev.filter(msg => msg.id !== (Date.now().toString() + '-loading')));
-      
+
       if (data) {
         const formattedResponse = formatApiResponse(data, system, inputValue);
         const botResponse: Message = {
@@ -630,172 +629,172 @@ const AIChatbot = () => {
 
   const getBotResponse = (input: string): string => {
     const lowercaseInput = input.toLowerCase();
-    
+
     // API Endpoints
     if (lowercaseInput.includes("ayurved") || lowercaseInput.includes("ayurveda")) {
       return "The Ayurveda API allows you to search Ayurvedic medical terminologies. Use the endpoint: GET /terminologies/ayurveda/search/?q=query. Responses include English names, Hindi names, and diacritical representations.";
     }
-    
+
     if (lowercaseInput.includes("siddha")) {
       return "The Siddha API provides access to Siddha medical terminologies. Use the endpoint: GET /terminologies/siddha/search/?q=query. Responses include English names, Tamil names, and romanized representations.";
     }
-    
+
     if (lowercaseInput.includes("unani")) {
       return "The Unani API offers Unani medical terminologies. Use the endpoint: GET /terminologies/unani/search/?q=query. Responses include English names, Arabic names, and romanized representations.";
     }
-    
+
     if (lowercaseInput.includes("icd") || lowercaseInput.includes("icd-11")) {
       return "The ICD-11 API provides access to WHO's International Classification of Diseases. Use the endpoint: GET /terminologies/icd11/search/?q=query. Responses include foundation URIs, codes, and titles.";
     }
-    
+
     if (lowercaseInput.includes("mapping") || lowercaseInput.includes("map")) {
       return "The Mappings API finds connections between traditional medicine terminologies and ICD-11 codes. Use the endpoint: GET /terminologies/mappings/?system=system&q=query&min_confidence=0.1. Responses include confidence scores and matched terms.";
     }
-    
+
     if (lowercaseInput.includes("combined") || lowercaseInput.includes("all systems")) {
       return "The Combined Search API searches across all ICD-11 terms and their related NAMASTE concepts. Use the endpoint: GET /terminologies/search/combined/?q=query&fuzzy=true&use_fts=true. It returns ICD-11 terms with their related Ayurveda, Siddha, and Unani mappings.";
     }
-    
+
     // Search parameters
     if (lowercaseInput.includes("search") || lowercaseInput.includes("query") || lowercaseInput.includes("parameter")) {
       return "All search APIs accept a 'q' parameter for the search query. The mappings API also accepts 'system' (ayurveda, siddha, or unani) and 'min_confidence' (0.1 to 1.0) parameters.";
     }
-    
+
     // Response format
     if (lowercaseInput.includes("response") || lowercaseInput.includes("format") || lowercaseInput.includes("structure")) {
       return "API responses follow a consistent structure with 'count', 'next', 'previous', and 'results' fields. Each result object contains system-specific fields like codes, names in different languages, and metadata.";
     }
-    
+
     // Examples
     if (lowercaseInput.includes("example") || lowercaseInput.includes("sample")) {
       return "You can view sample responses for each API on their respective documentation pages. The Testing Playground also allows you to try live queries and see real responses.";
     }
-    
+
     // Authentication
     if (lowercaseInput.includes("auth") || lowercaseInput.includes("authentication") || lowercaseInput.includes("key") || lowercaseInput.includes("token")) {
       return "The API currently doesn't require authentication for search endpoints. However, for production use, we recommend implementing rate limiting and API keys for tracking usage.";
     }
-    
+
     // Rate limits
     if (lowercaseInput.includes("rate limit") || lowercaseInput.includes("throttling") || lowercaseInput.includes("quota")) {
       return "The API has a rate limit of 100 requests per minute per IP address. If you need higher limits for your application, please contact our support team.";
     }
-    
+
     // Error handling
     if (lowercaseInput.includes("error") || lowercaseInput.includes("status code") || lowercaseInput.includes("failure")) {
       return "The API uses standard HTTP status codes: 200 for success, 400 for bad requests, 404 for not found, and 500 for server errors. Error responses include a message explaining what went wrong.";
     }
-    
+
     // Pagination
     if (lowercaseInput.includes("page") || lowercaseInput.includes("pagination") || lowercaseInput.includes("next") || lowercaseInput.includes("previous")) {
       return "API responses include pagination information with 'next' and 'previous' fields containing URLs to the next and previous pages of results. Use the 'page' parameter to navigate through results.";
     }
-    
+
     // Data sources
     if (lowercaseInput.includes("data source") || lowercaseInput.includes("where does the data come from") || lowercaseInput.includes("accuracy")) {
       return "The data comes from official sources including the Ministry of AYUSH, WHO ICD-11 Traditional Medicine Module, and validated academic resources. All terminologies have been verified by domain experts.";
     }
-    
+
     // Languages supported
     if (lowercaseInput.includes("language") || lowercaseInput.includes("hindi") || lowercaseInput.includes("tamil") || lowercaseInput.includes("arabic")) {
       return "The API supports multiple languages: Ayurveda terms include Hindi names, Siddha terms include Tamil names, and Unani terms include Arabic names. All responses also include English translations.";
     }
-    
+
     // ICD-11 integration
     if (lowercaseInput.includes("integrat") || lowercaseInput.includes("icd-11") || lowercaseInput.includes("who")) {
       return "The API integrates with WHO's ICD-11 Traditional Medicine Module 2 (TM2), allowing mapping between traditional medicine terminologies and modern medical classification systems.";
     }
-    
+
     // Usage examples
     if (lowercaseInput.includes("how to use") || lowercaseInput.includes("implementation") || lowercaseInput.includes("code example")) {
       return "You can use the API by making HTTP GET requests to the endpoints. For example, to search Ayurveda terms: `fetch('https://ayushbandan.duckdns.org/terminologies/ayurveda/search/?q=fever')`. Check the documentation for more examples.";
     }
-    
+
     // Response time
     if (lowercaseInput.includes("response time") || lowercaseInput.includes("performance") || lowercaseInput.includes("speed")) {
       return "The API typically responds within 100-300ms for most queries. Complex searches or those with many results may take slightly longer. We continuously optimize for performance.";
     }
-    
+
     // Filters
     if (lowercaseInput.includes("filter") || lowercaseInput.includes("sort") || lowercaseInput.includes("order")) {
       return "You can filter results using query parameters. For example, add `&system=ayurveda` to the mappings endpoint to filter by system. Sorting is currently not supported but planned for future releases.";
     }
-    
+
     // Data volume
     if (lowercaseInput.includes("how many") || lowercaseInput.includes("data points") || lowercaseInput.includes("records")) {
       return "The API contains over 4,500 Ayurveda terms, 1,200+ Siddha terms, 1,800+ Unani terms, and 529 ICD-11 TM2 codes, with mappings between these systems.";
     }
-    
+
     // FHIR compliance
     if (lowercaseInput.includes("fhir") || lowercaseInput.includes("standard") || lowercaseInput.includes("compliance")) {
       return "The API is FHIR R4 compliant and follows India EHR Standards 2016, ensuring interoperability with healthcare systems and electronic medical records.";
     }
-    
+
     // Future features
     if (lowercaseInput.includes("future") || lowercaseInput.includes("roadmap") || lowercaseInput.includes("upcoming")) {
       return "Upcoming features include: advanced search filters, more language support, bulk download options, user accounts for saving searches, and expanded traditional medicine systems.";
     }
-    
+
     // Support
     if (lowercaseInput.includes("support") || lowercaseInput.includes("help") || lowercaseInput.includes("contact")) {
       return "For support, please email support@tradmedapi.com or visit our documentation portal. We typically respond within 24 hours for technical inquiries.";
     }
-    
+
     // Open source
     if (lowercaseInput.includes("open source") || lowercaseInput.includes("github") || lowercaseInput.includes("contribute")) {
       return "The API is not currently open source, but we're considering open-sourcing components in the future. Please contact us if you're interested in contributing.";
     }
-    
+
     // Commercial use
     if (lowercaseInput.includes("commercial") || lowercaseInput.includes("license") || lowercaseInput.includes("cost") || lowercaseInput.includes("price")) {
       return "The API is free for research and non-commercial use. For commercial applications, please contact us for licensing information and pricing details.";
     }
-    
+
     // Data updates
     if (lowercaseInput.includes("update") || lowercaseInput.includes("refresh") || lowercaseInput.includes("how often")) {
       return "The data is updated quarterly with new terms and corrections. ICD-11 mappings are updated annually to align with WHO releases. You can subscribe to our newsletter for update notifications.";
     }
-    
+
     // API versioning
     if (lowercaseInput.includes("version") || lowercaseInput.includes("v1") || lowercaseInput.includes("backward compatibility")) {
       return "The current API version is v1.0.0. We maintain backward compatibility for at least 12 months after releasing new versions. Deprecated endpoints will be announced 6 months in advance.";
     }
-    
+
     // Code examples
     if (lowercaseInput.includes("curl") || lowercaseInput.includes("python") || lowercaseInput.includes("javascript")) {
       return "You can find code examples in multiple programming languages (Python, JavaScript, cURL) in the 'All Endpoints' section of the documentation. Each endpoint includes example requests and responses.";
     }
-    
+
     // Healthcare integration
     if (lowercaseInput.includes("ehr") || lowercaseInput.includes("electronic health record") || lowercaseInput.includes("emr")) {
       return "The API is designed for easy integration with EHR/EMR systems. It supports FHIR standards and can be used to map traditional medicine diagnoses to ICD-11 codes for billing and records.";
     }
-    
+
     // Traditional medicine concepts
     if (lowercaseInput.includes("dosha") || lowercaseInput.includes("vata") || lowercaseInput.includes("pitta") || lowercaseInput.includes("kapha")) {
       return "The API includes information about Ayurvedic doshas (Vata, Pitta, Kapha) and their related conditions. Search for specific dosha-related terms to find associated conditions and treatments.";
     }
-    
+
     // Siddha concepts
     if (lowercaseInput.includes("vatham") || lowercaseInput.includes("pitham") || lowercaseInput.includes("kapham") || lowercaseInput.includes("mukkutram")) {
       return "The Siddha API includes information about the three humors (Vatham, Pitham, Kapham) and their role in Siddha medicine. Search for these terms to learn more about Siddha concepts.";
     }
-    
+
     // Unani concepts
     if (lowercaseInput.includes("mizaj") || lowercaseInput.includes("akhlat") || lowercaseInput.includes("arz") || lowercaseInput.includes("nafs")) {
       return "The Unani API includes information about Mizaj (temperament), Akhlat (humors), Arz (disease), and Nafs (psyche) concepts. Search for these terms to explore Unani medicine principles.";
     }
-    
+
     // Confidence scores
     if (lowercaseInput.includes("confidence") || lowercaseInput.includes("accuracy") || lowercaseInput.includes("score")) {
       return "Mappings include confidence scores from 0.1 to 1.0, indicating the strength of the match between traditional medicine terms and ICD-11 codes. Higher scores indicate stronger matches.";
     }
-    
+
     // Fuzzy matching
     if (lowercaseInput.includes("fuzzy") || lowercaseInput.includes("similar") || lowercaseInput.includes("approximate")) {
       return "The API uses fuzzy matching algorithms to find similar terms even with spelling variations. Results include a similarity score showing how close the match is to your query.";
     }
-    
+
     // Default responses for common questions
     const responses: Record<string, string> = {
       "hello": "Hello! How can I help you with the API documentation today?",
@@ -806,14 +805,14 @@ const AIChatbot = () => {
       "who are you": "I'm an AI assistant for the Traditional Medicine API documentation. I can answer questions about our APIs and help you get started.",
       "how are you": "I'm functioning well, thank you! Ready to help you with any API questions you might have.",
     };
-    
+
     // Check for simple greetings
     for (const [question, answer] of Object.entries(responses)) {
       if (lowercaseInput.includes(question)) {
         return answer;
       }
     }
-    
+
     // Default response for unrecognized queries
     return "I can help you understand the API endpoints, response formats, and how to use the search parameters. Try asking about specific APIs like Ayurveda, Siddha, Unani, ICD-11, or Mappings. You can also ask about authentication, rate limits, or code examples. To search for specific diseases, try phrases like 'search for fever in Ayurveda' or 'find diabetes in ICD-11'.";
   };
@@ -836,7 +835,7 @@ const AIChatbot = () => {
   }
 
   return (
-<Card className="fixed bottom-6 right-6 w-full max-w-[380px] h-[580px] shadow-xl z-50 flex flex-col mx-4 sm:mx-0 translate-x-[30px] sm:translate-x-0">
+    <Card className="fixed bottom-6 right-6 w-full max-w-[380px] h-[580px] shadow-xl z-50 flex flex-col mx-4 sm:mx-0 translate-x-[30px] sm:translate-x-0">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -872,9 +871,8 @@ const AIChatbot = () => {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-2 ${
-                  message.sender === "user" ? "justify-end" : "justify-start"
-                }`}
+                className={`flex gap-2 ${message.sender === "user" ? "justify-end" : "justify-start"
+                  }`}
               >
                 {message.sender === "bot" && (
                   <div className="h-6 w-6 rounded-full bg-[#1e88e5]/10 flex items-center justify-center flex-shrink-0 mt-1">
@@ -882,11 +880,10 @@ const AIChatbot = () => {
                   </div>
                 )}
                 <div
-                  className={`max-w-[250px] rounded-lg p-2 text-sm ${
-                    message.sender === "user"
+                  className={`max-w-[250px] rounded-lg p-2 text-sm ${message.sender === "user"
                       ? "bg-[#1e88e5] text-white"
                       : "bg-muted"
-                  }`}
+                    }`}
                 >
                   <p className="whitespace-pre-wrap">{message.content}</p>
                   {message.hasMore && message.fullData && message.system && message.query && (
@@ -1006,7 +1003,7 @@ const HeroSection = () => {
           }
         };
         setStats(fallbackData);
-        
+
         animateCount('total_mappings', fallbackData.total_mappings);
         animateCount('ayurveda', fallbackData.by_system.ayurveda);
         animateCount('siddha', fallbackData.by_system.siddha);
@@ -1199,8 +1196,8 @@ const ApiResponseDisplay = ({ data, loading, error }) => {
               <tr key={index} className={index % 2 === 0 ? 'bg-background' : 'bg-muted/50'}>
                 {headers.map((header) => (
                   <td key={header} className="px-4 py-2 border-b">
-                    {typeof row[header] === 'object' 
-                      ? JSON.stringify(row[header]) 
+                    {typeof row[header] === 'object'
+                      ? JSON.stringify(row[header])
                       : String(row[header] || 'N/A')}
                   </td>
                 ))}
@@ -1270,18 +1267,18 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
 
   const handleSearch = async () => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const url = `${API_BASE_URL}${endpoint}${query}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setResponseData(data);
     } catch (err) {
@@ -1316,9 +1313,9 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
             Search
           </Button>
         </div>
-        
+
         <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-        
+
         {responseData && (
           <div className="mt-6">
             <h4 className="font-medium mb-3">Endpoint Information</h4>
@@ -1329,9 +1326,9 @@ const ApiTestingComponent = ({ endpoint, title, description, defaultQuery = "" }
                   <code className="bg-muted-foreground/10 px-2 py-1 rounded flex-1 overflow-x-auto">
                     {API_BASE_URL_DISPLAY}{endpoint}{query}
                   </code>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="h-8 w-8 p-0"
                     onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}${endpoint}${query}`)}
                   >
@@ -1364,18 +1361,18 @@ const CombinedSearchComponent = () => {
 
   const handleSearch = async () => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const url = `${API_BASE_URL}/terminologies/search/combined/?q=${encodeURIComponent(query)}&fuzzy=${fuzzy}&use_fts=${useFts}&threshold=${threshold}&page_size=${pageSize}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setResponseData(data);
     } catch (err) {
@@ -1405,7 +1402,7 @@ const CombinedSearchComponent = () => {
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
             />
           </div>
-          
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Page Size</label>
             <Input
@@ -1416,7 +1413,7 @@ const CombinedSearchComponent = () => {
               onChange={(e) => setPageSize(parseInt(e.target.value) || 10)}
             />
           </div>
-          
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Similarity Threshold</label>
             <Input
@@ -1428,7 +1425,7 @@ const CombinedSearchComponent = () => {
               onChange={(e) => setThreshold(parseFloat(e.target.value))}
             />
           </div>
-          
+
           <div className="flex flex-col gap-2 justify-end">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -1443,7 +1440,7 @@ const CombinedSearchComponent = () => {
                   Fuzzy Search
                 </label>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -1459,7 +1456,7 @@ const CombinedSearchComponent = () => {
             </div>
           </div>
         </div>
-        
+
         <Button onClick={handleSearch} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
           {loading ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1468,9 +1465,9 @@ const CombinedSearchComponent = () => {
           )}
           Combined Search
         </Button>
-        
+
         <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-        
+
         {responseData && (
           <div className="mt-6">
             <h4 className="font-medium mb-3">Endpoint Information</h4>
@@ -1481,9 +1478,9 @@ const CombinedSearchComponent = () => {
                   <code className="bg-muted-foreground/10 px-2 py-1 rounded flex-1 overflow-x-auto">
                     {API_BASE_URL_DISPLAY}/terminologies/search/combined/?q={query}&fuzzy={fuzzy}&use_fts={useFts}&threshold={threshold}&page_size={pageSize}
                   </code>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="h-8 w-8 p-0"
                     onClick={() => copyToClipboard(`${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${query}&fuzzy=${fuzzy}&use_fts=${useFts}&threshold=${threshold}&page_size=${pageSize}`)}
                   >
@@ -1524,7 +1521,7 @@ const UploadPage = () => {
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -1535,11 +1532,11 @@ const UploadPage = () => {
         method: 'POST',
         body: formData,
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setResponseData(data);
     } catch (err) {
@@ -1573,7 +1570,7 @@ const UploadPage = () => {
           Upload CSV files to populate traditional medicine terminology databases. Updates existing records by code or creates new ones.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <Card className="mb-8">
@@ -1595,7 +1592,7 @@ const UploadPage = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium mb-2 block">CSV File</label>
                 <Input
@@ -1607,7 +1604,7 @@ const UploadPage = () => {
                   Required columns: {systemInfo[selectedSystem].columns}
                 </p>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -1620,7 +1617,7 @@ const UploadPage = () => {
                   Update search vectors after import
                 </label>
               </div>
-              
+
               <Button onClick={handleUpload} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
                 {loading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1631,7 +1628,7 @@ const UploadPage = () => {
               </Button>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -1645,14 +1642,14 @@ const UploadPage = () => {
                   <h4 className="font-medium text-sm mb-1">Method</h4>
                   <Badge variant="outline" className="mb-2">POST</Badge>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">URL</h4>
                   <div className="bg-muted p-2 rounded text-sm overflow-x-auto">
                     <code>{`${API_BASE_URL_DISPLAY}/terminologies/{system}/csv/upload/`}</code>
                   </div>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Parameters</h4>
                   <ul className="text-sm space-y-2">
@@ -1660,7 +1657,7 @@ const UploadPage = () => {
                     <li><span className="font-medium">update_search_vector</span> - Whether to update search vectors after import (default: true)</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Responses</h4>
                   <ul className="text-sm space-y-2">
@@ -1673,10 +1670,10 @@ const UploadPage = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-          
+
           {responseData && (
             <Card className="mt-6">
               <CardHeader>
@@ -1701,7 +1698,7 @@ const UploadPage = () => {
                     <div className="text-sm text-gray-800">Total Processed</div>
                   </div>
                 </div>
-                
+
                 {responseData.errors && responseData.errors.length > 0 && (
                   <div className="mt-4">
                     <h4 className="font-medium mb-2">Errors</h4>
@@ -1753,18 +1750,18 @@ const AutocompletePage = () => {
 
   const handleSearch = async () => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const url = `${API_BASE_URL}/terminologies/${selectedSystem}/autocomplete/?q=${encodeURIComponent(query)}&limit=${limit}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setResponseData(data);
     } catch (err) {
@@ -1783,7 +1780,7 @@ const AutocompletePage = () => {
           Fast autocomplete endpoints for traditional medicine terminologies - returns only matching titles for optimal performance.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <Card className="mb-8">
@@ -1806,7 +1803,7 @@ const AutocompletePage = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium mb-2 block">Search Term</label>
                 <Input
@@ -1819,7 +1816,7 @@ const AutocompletePage = () => {
                   Searches across: {systemInfo[selectedSystem].searchFields}
                 </p>
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium mb-2 block">Limit</label>
                 <Input
@@ -1833,7 +1830,7 @@ const AutocompletePage = () => {
                   Maximum results to return (default: 10, max: 20)
                 </p>
               </div>
-              
+
               <Button onClick={handleSearch} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
                 {loading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -1844,7 +1841,7 @@ const AutocompletePage = () => {
               </Button>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -1858,14 +1855,14 @@ const AutocompletePage = () => {
                   <h4 className="font-medium text-sm mb-1">Method</h4>
                   <Badge variant="outline" className="mb-2">GET</Badge>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">URL</h4>
                   <div className="bg-muted p-2 rounded text-sm overflow-x-auto">
                     <code>{`${API_BASE_URL_DISPLAY}/terminologies/{system}/autocomplete/`}</code>
                   </div>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Parameters</h4>
                   <ul className="text-sm space-y-2">
@@ -1873,7 +1870,7 @@ const AutocompletePage = () => {
                     <li><span className="font-medium">limit</span> - Maximum results to return (default: 10, max: 20)</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Response</h4>
                   <p className="text-sm">Array of matching title names only</p>
@@ -1882,10 +1879,10 @@ const AutocompletePage = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-          
+
           {responseData && Array.isArray(responseData) && (
             <Card className="mt-6">
               <CardHeader>
@@ -1922,7 +1919,7 @@ const AyurvedaPage = () => {
           Search and explore Ayurveda medical terminologies with detailed information including English names, Hindi names, and diacritical representations.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
@@ -1930,7 +1927,7 @@ const AyurvedaPage = () => {
             title="Search Ayurveda Terms"
             description="Search Ayurveda terminologies by disease names, symptoms, or conditions."
           />
-          
+
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -1967,7 +1964,7 @@ const AyurvedaPage = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -1986,7 +1983,7 @@ const AyurvedaPage = () => {
                     <li><span className="font-medium">results</span> - Array of terminology objects</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
                   <ul className="text-sm space-y-2">
@@ -2001,7 +1998,7 @@ const AyurvedaPage = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <Card className="mb-8">
             <CardHeader>
@@ -2012,7 +2009,7 @@ const AyurvedaPage = () => {
                 Ayurveda is one of the world's oldest holistic healing systems, developed more than 3,000 years ago in India.
                 It's based on the belief that health and wellness depend on a delicate balance between the mind, body, and spirit.
               </p>
-              
+
               <div className="grid grid-cols-1 gap-6 mt-6">
                 <Card>
                   <CardHeader className="pb-3">
@@ -2028,7 +2025,7 @@ const AyurvedaPage = () => {
                     </ul>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-md">Common Treatments</CardTitle>
@@ -2062,7 +2059,7 @@ const SiddhaPage = () => {
           Explore Siddha medical terminologies with English names, Tamil names, and romanized representations.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
@@ -2070,7 +2067,7 @@ const SiddhaPage = () => {
             title="Search Siddha Terms"
             description="Search Siddha terminologies by disease names, symptoms, or conditions."
           />
-          
+
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -2107,7 +2104,7 @@ const SiddhaPage = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -2126,7 +2123,7 @@ const SiddhaPage = () => {
                     <li><span className="font-medium">results</span> - Array of terminology objects</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
                   <ul className="text-sm space-y-2">
@@ -2141,7 +2138,7 @@ const SiddhaPage = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <Card className="mb-8">
             <CardHeader>
@@ -2152,7 +2149,7 @@ const SiddhaPage = () => {
                 Siddha medicine is one of the oldest medical systems in India, originating from Tamil Nadu.
                 It emphasizes the importance of physical, mental, and spiritual well-being.
               </p>
-              
+
               <div className="grid grid-cols-1 gap-6 mt-6">
                 <Card>
                   <CardHeader className="pb-3">
@@ -2168,7 +2165,7 @@ const SiddhaPage = () => {
                     </ul>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-md">Common Treatments</CardTitle>
@@ -2202,7 +2199,7 @@ const UnaniPage = () => {
           Explore Unani medical terminologies with English names, Arabic names, and romanized representations.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
@@ -2210,7 +2207,7 @@ const UnaniPage = () => {
             title="Search Unani Terms"
             description="Search Unani terminologies by disease names, symptoms, or conditions."
           />
-          
+
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -2247,7 +2244,7 @@ const UnaniPage = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -2266,7 +2263,7 @@ const UnaniPage = () => {
                     <li><span className="font-medium">results</span> - Array of terminology objects</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
                   <ul className="text-sm space-y-2">
@@ -2281,7 +2278,7 @@ const UnaniPage = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <Card className="mb-8">
             <CardHeader>
@@ -2292,7 +2289,7 @@ const UnaniPage = () => {
                 Unani medicine is a traditional system of medicine that originated in Greece and was developed further by Arab and Persian physicians.
                 It is based on the concept of the four humors: blood, phlegm, yellow bile, and black bile.
               </p>
-              
+
               <div className="grid grid-cols-1 gap-6 mt-6">
                 <Card>
                   <CardHeader className="pb-3">
@@ -2308,7 +2305,7 @@ const UnaniPage = () => {
                     </ul>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-md">Common Treatments</CardTitle>
@@ -2342,7 +2339,7 @@ const ICD11Page = () => {
           Search ICD-11 medical codes and terminologies with detailed information.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <ApiTestingComponent
@@ -2351,7 +2348,7 @@ const ICD11Page = () => {
             description="Search ICD-11 terminologies by disease names, symptoms, or conditions."
             defaultQuery="Diabet"
           />
-          
+
           <Card className="mb-8">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -2387,7 +2384,7 @@ const ICD11Page = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -2406,7 +2403,7 @@ const ICD11Page = () => {
                     <li><span className="font-medium">results</span> - Array of terminology objects</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-sm mb-1">Terminology Fields</h4>
                   <ul className="text-sm space-y-2">
@@ -2420,7 +2417,7 @@ const ICD11Page = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <Card className="mb-8">
             <CardHeader>
@@ -2431,7 +2428,7 @@ const ICD11Page = () => {
                 The International Classification of Diseases (ICD) is the global standard for diagnostic health information.
                 ICD-11 is the eleventh revision, which includes a chapter on traditional medicine.
               </p>
-              
+
               <div className="grid grid-cols-1 gap-6 mt-6">
                 <Card>
                   <CardHeader className="pb-3">
@@ -2447,7 +2444,7 @@ const ICD11Page = () => {
                     </ul>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-md">Traditional Medicine Module</CardTitle>
@@ -2484,18 +2481,18 @@ const MappingsTestingPage = () => {
 
   const handleSearch = async () => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const url = `${API_BASE_URL}/terminologies/mappings/?system=${system}&q=${query}&min_confidence=${minConfidence}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setResponseData(data);
     } catch (err) {
@@ -2508,13 +2505,13 @@ const MappingsTestingPage = () => {
 
   const handleTest = async () => {
     if (!testQuery.trim() && selectedEndpoint !== "mappings") return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       let url = '';
-      
+
       if (selectedEndpoint === "mappings") {
         url = `${API_BASE_URL}/terminologies/mappings/?system=ayurveda&q=${testQuery || "fever"}&min_confidence=0.1`;
       } else if (selectedEndpoint === "combined") {
@@ -2528,13 +2525,13 @@ const MappingsTestingPage = () => {
         };
         url = endpoints[selectedEndpoint] + testQuery;
       }
-      
+
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setResponseData(data);
     } catch (err) {
@@ -2553,7 +2550,7 @@ const MappingsTestingPage = () => {
           Find mappings between traditional medicine terminologies and ICD-11 codes with confidence scores, and test all API endpoints.
         </p>
       </div>
-      
+
       <Tabs defaultValue="mappings" className="mb-8">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="mappings">Combined Search</TabsTrigger>
@@ -2632,22 +2629,20 @@ const MappingsTestingPage = () => {
                 <div className="text-sm text-muted-foreground cursor-pointer flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                     <span>Endpoint:</span>
-                    <code 
+                    <code
                       className="bg-muted px-2 py-1 rounded break-all overflow-x-auto max-w-full cursor-pointer"
                       onClick={() =>
                         navigator.clipboard.writeText(
                           selectedEndpoint === "combined"
-                            ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
-                                testQuery || "diabetes"
-                              }&fuzzy=true&use_fts=true&threshold=0.2`
+                            ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${testQuery || "diabetes"
+                            }&fuzzy=true&use_fts=true&threshold=0.2`
                             : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`
                         )
                       }
                     >
                       {selectedEndpoint === "combined"
-                        ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${
-                            testQuery || "diabetes"
-                          }&fuzzy=true&use_fts=true&threshold=0.2`
+                        ? `${API_BASE_URL_DISPLAY}/terminologies/search/combined/?q=${testQuery || "diabetes"
+                        }&fuzzy=true&use_fts=true&threshold=0.2`
                         : `${API_BASE_URL_DISPLAY}/terminologies/${selectedEndpoint}/search/?q=${testQuery}`}
                     </code>
                   </div>
@@ -2657,13 +2652,13 @@ const MappingsTestingPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       <ApiResponseDisplay data={responseData} loading={loading} error={error} />
-      
+
       {responseData && responseData.results && responseData.results.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-bold mb-4">Mapping Results</h3>
-          
+
           <div className="space-y-4">
             {responseData.results.map((mapping, index) => (
               <Card key={index}>
@@ -2692,7 +2687,7 @@ const MappingsTestingPage = () => {
                           )}
                         </div>
                       </div>
-                      
+
                       <div>
                         <h4 className="font-medium mb-2">ICD-11 Mapping</h4>
                         {mapping.icd_mapping ? (
@@ -3065,94 +3060,93 @@ const AllEndpointsPage = () => {
           Explore all available API endpoints with detailed information and sample responses.
         </p>
       </div>
-      
+
       <div className="space-y-4">
         {endpoints.map((endpoint, index) => (
           <Card key={index} className="overflow-hidden">
-            <div 
+            <div
               className="p-6 cursor-pointer hover:bg-muted/50 transition-colors"
               onClick={() => toggleEndpoint(endpoint.name)}
             >
-          {/* ----------  responsive endpoint card  ---------- */}
-<div className="flex flex-col gap-3">
-  {/* top line : method + name + toggle chevron */}
-  <div className="flex items-start gap-3">
-    <Badge variant="outline" className="shrink-0 mt-1">
-      {endpoint.method}
-    </Badge>
+              {/* ----------  responsive endpoint card  ---------- */}
+              <div className="flex flex-col gap-3">
+                {/* top line : method + name + toggle chevron */}
+                <div className="flex items-start gap-3">
+                  <Badge variant="outline" className="shrink-0 mt-1">
+                    {endpoint.method}
+                  </Badge>
 
-    <div className="min-w-0 flex-1">
-      <h3 className="font-semibold text-base break-words">{endpoint.name}</h3>
-      <p className="text-muted-foreground text-sm mt-1">{endpoint.description}</p>
-    </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-base break-words">{endpoint.name}</h3>
+                    <p className="text-muted-foreground text-sm mt-1">{endpoint.description}</p>
+                  </div>
 
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={(e) => {
-        e.stopPropagation();
-        toggleEndpoint(endpoint.name);
-      }}
-      className="shrink-0"
-    >
-      <ChevronRight
-        className={`h-4 w-4 transition-transform ${
-          expandedEndpoint === endpoint.name ? 'rotate-90' : ''
-        }`}
-      />
-    </Button>
-  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleEndpoint(endpoint.name);
+                    }}
+                    className="shrink-0"
+                  >
+                    <ChevronRight
+                      className={`h-4 w-4 transition-transform ${expandedEndpoint === endpoint.name ? 'rotate-90' : ''
+                        }`}
+                    />
+                  </Button>
+                </div>
 
-  {/* endpoint line : label + url (scrollable) + copy button */}
-  <div className="flex items-center gap-2">
-    <span className="text-sm font-medium shrink-0">URL:</span>
+                {/* endpoint line : label + url (scrollable) + copy button */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium shrink-0">URL:</span>
 
-    {/* scrollable url box */}
-    <div className="min-w-0 flex-1 rounded-md border bg-muted px-3 py-2">
-     <code className="text-sm leading-none whitespace-pre-wrap break-all">
-        {API_BASE_URL_DISPLAY}{endpoint.endpoint}
-      </code>
-    </div>
+                  {/* scrollable url box */}
+                  <div className="min-w-0 flex-1 rounded-md border bg-muted px-3 py-2">
+                    <code className="text-sm leading-none whitespace-pre-wrap break-all">
+                      {API_BASE_URL_DISPLAY}{endpoint.endpoint}
+                    </code>
+                  </div>
 
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={(e) => {
-        e.stopPropagation();
-        copyToClipboard(API_BASE_URL_DISPLAY + endpoint.endpoint);
-      }}
-      className="shrink-0 bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white"
-    >
-      <Copy className="h-4 w-4 mr-1" />
-      Copy
-    </Button>
-  </div>
-</div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyToClipboard(API_BASE_URL_DISPLAY + endpoint.endpoint);
+                    }}
+                    className="shrink-0 bg-[#1e88e5] hover:bg-[#1e88e5]/90 text-white"
+                  >
+                    <Copy className="h-4 w-4 mr-1" />
+                    Copy
+                  </Button>
+                </div>
+              </div>
             </div>
-            
-           <AnimatePresence>
-  {expandedEndpoint === endpoint.name && (
-    <motion.div
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: 'auto', opacity: 1 }}
-      exit={{ height: 0, opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="overflow-hidden"
-    >
-      {/*  FIXED 500 px wrapper  */}
-      <div className="max-w-[350px] md:max-w-none px-6 pb-6">
-        <h4 className="font-medium mb-3">Sample Response</h4>
 
-        {/*  scrollable JSON box  */}
-        <ScrollArea className="h-96 w-full rounded-md border">
-          <pre className="p-4 text-sm bg-[#1E1E1E] text-white">
-            <code>{JSON.stringify(endpoint.sample, null, 2)}</code>
-          </pre>
-        </ScrollArea>
-      </div>
-    </motion.div>
-  )}
-</AnimatePresence>
+            <AnimatePresence>
+              {expandedEndpoint === endpoint.name && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  {/*  FIXED 500 px wrapper  */}
+                  <div className="max-w-[350px] md:max-w-none px-6 pb-6">
+                    <h4 className="font-medium mb-3">Sample Response</h4>
+
+                    {/*  scrollable JSON box  */}
+                    <ScrollArea className="h-96 w-full rounded-md border">
+                      <pre className="p-4 text-sm bg-[#1E1E1E] text-white">
+                        <code>{JSON.stringify(endpoint.sample, null, 2)}</code>
+                      </pre>
+                    </ScrollArea>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         ))}
       </div>
@@ -3161,59 +3155,103 @@ const AllEndpointsPage = () => {
 };
 
 // Analytics Page Component
+// Analytics Page Component - Updated to handle missing endpoint better
 const AnalyticsPage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [usingFallback, setUsingFallback] = useState(false);
+
+  // Fallback data
+  const fallbackStats = {
+    total_mappings: 2399,
+    by_system: {
+      ayurveda: 787,
+      siddha: 490,
+      unani: 1122
+    },
+    confidence_distribution: {
+      high_confidence: 437,
+      medium_confidence: 976,
+      low_confidence: 986
+    },
+    top_icd_matches: [
+      {
+        icd_term__code: "1B20.3",
+        icd_term__title: "Complications of leprosy",
+        mapping_count: 44
+      },
+      {
+        icd_term__code: "8D43.5",
+        icd_term__title: "Cassava poisoning",
+        mapping_count: 30
+      },
+      {
+        icd_term__code: "1A72.4",
+        icd_term__title: "Gonococcal infection of eye",
+        mapping_count: 25
+      },
+      {
+        icd_term__code: "5A13.5",
+        icd_term__title: "Diabetes mellitus",
+        mapping_count: 22
+      },
+      {
+        icd_term__code: "MG24.0",
+        icd_term__title: "Fear of cancer",
+        mapping_count: 18
+      }
+    ],
+    recent_mappings: [
+      {
+        source_system: "siddha",
+        source_term: "Pulmonary tuberculosis",
+        icd_title: "Tuberculosis",
+        confidence_score: 0.78,
+        created_at: "2025-09-11T22:58:13.221955+05:30"
+      },
+      {
+        source_system: "ayurveda",
+        source_term: "Chronic fever",
+        icd_title: "Pyrexia of unknown origin",
+        confidence_score: 0.82,
+        created_at: "2025-09-10T14:23:45.123456+05:30"
+      },
+      {
+        source_system: "unani",
+        source_term: "Headache",
+        icd_title: "Headache",
+        confidence_score: 0.91,
+        created_at: "2025-09-09T09:15:30.789012+05:30"
+      }
+    ]
+  };
 
   // Fetch real-time stats on mount
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/terminologies/mappings/stats/`);
+        
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          if (response.status === 404) {
+            console.log("Stats endpoint not found, using fallback data");
+            setUsingFallback(true);
+            setStats(fallbackStats);
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        } else {
+          const data = await response.json();
+          setStats(data);
+          setUsingFallback(false);
         }
-        const data = await response.json();
-        setStats(data);
       } catch (err) {
-        setError(err.message);
         console.error("Error fetching stats:", err);
-        // Fallback data
-        setStats({
-          total_mappings: 2399,
-          by_system: {
-            ayurveda: 787,
-            siddha: 490,
-            unani: 1122
-          },
-          confidence_distribution: {
-            high_confidence: 437,
-            medium_confidence: 976,
-            low_confidence: 986
-          },
-          top_icd_matches: [
-            {
-              icd_term__code: "1B20.3",
-              icd_term__title: "Complications of leprosy",
-              mapping_count: 44
-            },
-            {
-              icd_term__code: "8D43.5",
-              icd_term__title: "Cassava poisoning",
-              mapping_count: 30
-            }
-          ],
-          recent_mappings: [
-            {
-              source_system: "siddha",
-              source_term: "Pulmonary tuberculosis",
-              icd_title: "Tuberculosis",
-              confidence_score: 0.78,
-              created_at: "2025-09-11T22:58:13.221955+05:30"
-            }
-          ]
-        });
+        setError(err.message);
+        // Use fallback data on any error
+        setUsingFallback(true);
+        setStats(fallbackStats);
       } finally {
         setLoading(false);
       }
@@ -3233,14 +3271,15 @@ const AnalyticsPage = () => {
     );
   }
 
-  if (error) {
+  // Even if there's an error, we still have fallback stats
+  if (!stats) {
     return (
       <div className="px-4 py-8 max-w-6xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
           <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3" />
           <div>
-            <h4 className="text-red-800 font-medium">Error fetching analytics</h4>
-            <p className="text-red-700 text-sm mt-1">{error}</p>
+            <h4 className="text-red-800 font-medium">Unable to load analytics</h4>
+            <p className="text-red-700 text-sm mt-1">Please try again later or contact support.</p>
           </div>
         </div>
       </div>
@@ -3250,12 +3289,21 @@ const AnalyticsPage = () => {
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">API Analytics</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold mb-2">API Analytics</h2>
+          {usingFallback && (
+            <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+              Using Demo Data
+            </Badge>
+          )}
+        </div>
         <p className="text-muted-foreground">
-          View real-time usage statistics, mapping distribution, and system performance metrics.
+          {usingFallback 
+            ? "Showing demo analytics data. Connect to backend for real-time statistics."
+            : "View real-time usage statistics, mapping distribution, and system performance metrics."}
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader>
@@ -3270,14 +3318,14 @@ const AnalyticsPage = () => {
                 <div className="text-3xl font-bold text-blue-600">{stats.total_mappings}</div>
                 <div className="text-sm text-blue-800">Total Mappings</div>
               </div>
-              
+
               {Object.entries(stats.by_system).map(([system, count]) => (
                 <div key={system} className="flex items-center justify-between">
                   <span className="capitalize font-medium">{system}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-32 bg-muted rounded-full h-2.5">
-                      <div 
-                        className="bg-[#1e88e5] h-2.5 rounded-full" 
+                      <div
+                        className="bg-[#1e88e5] h-2.5 rounded-full"
                         style={{ width: `${(count / stats.total_mappings) * 100}%` }}
                       ></div>
                     </div>
@@ -3288,7 +3336,7 @@ const AnalyticsPage = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -3303,8 +3351,8 @@ const AnalyticsPage = () => {
                   <span className="capitalize font-medium">{level.replace('_', ' ')}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-32 bg-muted rounded-full h-2.5">
-                      <div 
-                        className="bg-[#1e88e5] h-2.5 rounded-full" 
+                      <div
+                        className="bg-[#1e88e5] h-2.5 rounded-full"
                         style={{ width: `${(count / stats.total_mappings) * 100}%` }}
                       ></div>
                     </div>
@@ -3316,7 +3364,7 @@ const AnalyticsPage = () => {
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader>
@@ -3336,7 +3384,7 @@ const AnalyticsPage = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Recent Mappings</CardTitle>
@@ -3362,7 +3410,7 @@ const AnalyticsPage = () => {
           </CardContent>
         </Card>
       </div>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>System Distribution</CardTitle>
@@ -3381,6 +3429,21 @@ const AnalyticsPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {usingFallback && (
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start">
+            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 mr-3" />
+            <div>
+              <h4 className="font-medium text-yellow-800">Using Demo Data</h4>
+              <p className="text-sm text-yellow-700 mt-1">
+                The analytics endpoint (/terminologies/mappings/stats/) is not available on the backend. 
+                To enable real-time analytics, implement this endpoint on your server to return mapping statistics.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -3390,9 +3453,9 @@ const HomePage = () => {
   return (
     <div>
       <HeroSection />
-      
+
       <div className="px-4 py-12 max-w-6xl mx-auto">
-        <motion.section 
+        <motion.section
           className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3402,12 +3465,12 @@ const HomePage = () => {
           <h2 className="text-3xl font-bold mb-6">Introduction</h2>
           <div className="prose prose-lg max-w-none text-muted-foreground">
             <p className="mb-6">
-              Welcome to the comprehensive documentation for the NAMASTE & ICD-11 Integration API. 
-              This platform enables seamless integration of India's traditional medicine terminologies 
-              (Ayurveda, Siddha, and Unani) with WHO's ICD-11 Traditional Medicine Module 2 (TM2) 
+              Welcome to the comprehensive documentation for the NAMASTE & ICD-11 Integration API.
+              This platform enables seamless integration of India's traditional medicine terminologies
+              (Ayurveda, Siddha, and Unani) with WHO's ICD-11 Traditional Medicine Module 2 (TM2)
               for Electronic Medical Record (EMR) systems.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <Card>
                 <CardContent className="p-4 text-center">
@@ -3441,7 +3504,7 @@ const HomePage = () => {
           </div>
         </motion.section>
 
-        <motion.section 
+        <motion.section
           className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3449,7 +3512,7 @@ const HomePage = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl font-bold mb-6">Available Endpoints</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -3470,12 +3533,12 @@ const HomePage = () => {
                 </Button>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Database className="h-5 w-5 mr-2 text-[#1e88e5]" />
-                  Siddha API 
+                  Siddha API
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -3490,7 +3553,7 @@ const HomePage = () => {
                 </Button>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -3510,7 +3573,7 @@ const HomePage = () => {
                 </Button>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -3530,7 +3593,7 @@ const HomePage = () => {
                 </Button>
               </CardContent>
             </Card>
-            
+
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -3612,7 +3675,7 @@ const HomePage = () => {
           </div>
         </motion.section>
 
-        <motion.section 
+        <motion.section
           className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -3620,7 +3683,7 @@ const HomePage = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl font-bold mb-6">Getting Started</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
@@ -3632,7 +3695,7 @@ const HomePage = () => {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>2. Test APIs</CardTitle>
@@ -3643,7 +3706,7 @@ const HomePage = () => {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>3. Integrate</CardTitle>
@@ -3849,14 +3912,14 @@ const FHIRPage = () => {
     setLoading(true);
     setError(null);
     setSearchPerformed(true);
-    
+
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // Generate realistic FHIR resource
       const fhirResource = generateFHIRResource();
-      
+
       // Mock successful FHIR server response
       const mockResponse = {
         success: true,
@@ -3890,7 +3953,7 @@ const FHIRPage = () => {
         } : null,
         timestamp: new Date().toISOString()
       };
-      
+
       setResponseData(mockResponse);
     } catch (err) {
       setError(err.message);
@@ -3919,11 +3982,11 @@ const FHIRPage = () => {
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-4">FHIR R4 API</h2>
         <p className="text-muted-foreground">
-          Fully FHIR R4 compliant API for integrating traditional medicine data with modern healthcare systems. 
+          Fully FHIR R4 compliant API for integrating traditional medicine data with modern healthcare systems.
           Supports ABHA (Ayushman Bharat Health Account) and India EHR Standards 2016.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-8">
           <Card>
@@ -3955,7 +4018,7 @@ const FHIRPage = () => {
                   {fhirResources.find(r => r.value === selectedResource)?.description}
                 </p>
               </div>
-              
+
               {selectedResource === "Condition" && (
                 <div>
                   <label className="text-sm font-medium mb-2 block">Condition Code</label>
@@ -3970,7 +4033,7 @@ const FHIRPage = () => {
                   </p>
                 </div>
               )}
-              
+
               {selectedResource === "Patient" && (
                 <div>
                   <label className="text-sm font-medium mb-2 block">Patient ID</label>
@@ -3985,7 +4048,7 @@ const FHIRPage = () => {
                   </p>
                 </div>
               )}
-              
+
               <Button onClick={handleFHIRSearch} disabled={loading} className="w-full bg-[#1e88e5] hover:bg-[#1e88e5]/90">
                 {loading ? (
                   <>
@@ -4015,7 +4078,7 @@ const FHIRPage = () => {
               )}
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>FHIR Capability Statement</CardTitle>
@@ -4034,7 +4097,7 @@ const FHIRPage = () => {
                     <div className="text-lg font-bold text-green-700 dark:text-green-300">Yes</div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium mb-2">Supported Resources</h4>
                   <div className="grid grid-cols-2 gap-2">
@@ -4045,7 +4108,7 @@ const FHIRPage = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium mb-2">Code Systems</h4>
                   <div className="space-y-2">
@@ -4070,7 +4133,7 @@ const FHIRPage = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
@@ -4095,7 +4158,7 @@ const FHIRPage = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="space-y-6">
           {responseData && (
             <Card>
@@ -4115,7 +4178,7 @@ const FHIRPage = () => {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Status:</span>
@@ -4160,7 +4223,7 @@ const FHIRPage = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="bg-muted p-4 rounded-lg">
                     <h4 className="font-medium mb-2">FHIR Compliance</h4>
                     <div className="flex flex-wrap gap-2">
@@ -4175,7 +4238,7 @@ const FHIRPage = () => {
               </CardContent>
             </Card>
           )}
-          
+
           {!responseData && !loading && (
             <Card>
               <CardHeader>
@@ -4193,7 +4256,7 @@ const FHIRPage = () => {
               </CardContent>
             </Card>
           )}
-          
+
           <Card>
             <CardHeader>
               <CardTitle>NAMASTE & ICD-11 Integration</CardTitle>
@@ -4203,11 +4266,11 @@ const FHIRPage = () => {
                 <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
                   <h4 className="font-medium mb-2 text-blue-900 dark:text-blue-100">Dual Coding for Interoperability</h4>
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    This FHIR implementation supports dual coding with NAMASTE (4,500+ terms) and ICD-11 TM2 (529 disorder categories), 
+                    This FHIR implementation supports dual coding with NAMASTE (4,500+ terms) and ICD-11 TM2 (529 disorder categories),
                     enabling seamless integration between traditional medicine and biomedical systems while complying with India's 2016 EHR Standards.
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card>
                     <CardHeader className="pb-3">
@@ -4233,7 +4296,7 @@ const FHIRPage = () => {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-md flex items-center">
@@ -4275,10 +4338,10 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      
+
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 md:ml-64">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -4295,7 +4358,7 @@ function App() {
           </Routes>
         </div>
       </div>
-      
+
       <AIChatbot />
     </div>
   );
