@@ -249,7 +249,7 @@ const Header = () => {
                 className="h-14 w-14 object-contain"
               />
               <h1 className="text-xl md:text-2xl font-bold italic text-[#1e88e5]">
-                Ayush Bhandhan API Documentation
+                Med Bridge API Documentation
               </h1>
             </Link>
           </div>
